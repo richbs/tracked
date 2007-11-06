@@ -8,7 +8,7 @@ for event,node in gpxlog:
         gpxlog.expandNode(node)
         # We only want track points with a time stamp
         if node.getElementsByTagName('time'):
-            timenode = node.geAtElementsByTagName('time')
+            timenode = node.getElementsByTagName('time')
             elenode = node.getElementsByTagName('ele')
             timestring = timenode[0].firstChild.nodeValue
             elestring = elenode[0].firstChild.nodeValue
