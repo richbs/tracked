@@ -5,10 +5,8 @@ from django.db import models
 class WayPoint(models.Model):
     """(WayPoint description)"""
     
-
     class Admin:
-        list_display = ('',)
-        search_fields = ('',)
+        pass
 
     def __str__(self):
         return "WayPoint"
@@ -43,8 +41,7 @@ class Trip(models.Model):
     length = models.FloatField(max_digits=10, decimal_places=5)
 
     class Admin:
-        list_display = ('',)
-        search_fields = ('',)
+        pass
 
     def __str__(self):
         return "Trip"
@@ -56,10 +53,10 @@ class Track(models.Model):
     start_time  = models.DateTimeField()
     end_time    = models.DateTimeField()
     length = models.FloatField(max_digits=10, decimal_places=5)
+    waypoints   = models.ManyToManyField(WayPoint)
     class Admin:
-        list_display = ('',)
-        search_fields = ('',)
-
+        pass
+        
     def __str__(self):
         return "Track"
 
