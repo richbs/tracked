@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>
+8.65 miles of fun
+</title>
+<!-- Meta Tags -->
+<meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+<meta name="robots" content="index, follow" />
+
+<meta name="description" content="Implementation of Google Maps to mash up with Flickr/GPX XML waypoints and routes." />
+<meta name="keywords" content="UNIX, Mac, Training, GPS, GPX, Map" />
+<meta name="author" content="Richard Barrett-Small" />
+
+<!-- Favicon 
+<link rel="shortcut icon" href="" />
+-->
+<!-- CSS -->
+
+<link rel="stylesheet" href="/assets/css/rbstyle.css" type="text/css" />
+<!--
+	<link rel="stylesheet" href="/styles/default.css" media="screen,projection" type="text/css" />
+-->
+<link rel="stylesheet" href="/assets/js/slimbox.css" media="screen,projection" type="text/css" />
+
+<!-- JavaScript -->
+
+
+ <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
+
+<script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
+
+
+<script type="text/javascript" src="/assets/js/mootools.js"></script>
+<script type="text/javascript" src="/assets/js/slimbox.js"></script>
+
+<script type="text/javascript">
+	
+	
+	var d = new Date();
+    //<![CDATA[
+	var starttime = d.getTime();
+	var report =  'starting:' + d.getTime();
+    function GetMap() {
+      if (GBrowserIsCompatible()) {
+        
+		// Create an array of the Glatlngs for this track's photos
+		var photo_latlons = new Array();
+		var photo_urls	= new Array();
+		
+		// @todo add geophotos.url to an array
+				//var d = new Date();
+		// alert('photos done' + (d.getTime() - starttime );
+		// and for the track route to build polyline
+		
+		var track_latlons = new Array();
+    	{% for wp in waypoints %}
+       	track_latlons.push( new GLatLng( {{wp.latitude}}, {{wp.longitude}} ) );
+        {% endfor %}
+		report += ', tlength:' + track_latlons.length;
+		
+		
+		var d = new Date();
+		report += ', track done:' + (d.getTime() - starttime );
+        
+		//map.setCenter(new GLatLng(56.776,-3.932), 13);
+		function launchLightbox(e) {
+			Lightbox.show(e.href, e.title);
+			return false;
+		}
+        // Creates a marker at the given point with the given number label
+        function createMarker(point, img_url, img_large, img_name) {
+          var marker = new GMarker(point);
+          GEvent.addListener(marker, "click", function() {
+			var divvy = document.createElement('div');
+		
+			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><br /><span class=\"instruction\">Activate Lightbox</span></a></p>";
+			photo_link =  divvy.getElementsByTagName('a')[0];
+			photo_link.onclick = function(){launchLightbox(this); return false;};
+			// make the a listen for lightbox
+            marker.openInfoWindow(divvy);
+          });
+          return marker;
+        }
+
+        //create bounds object to set zoom level to fit all datapoints
+        var bounds = new GLatLngBounds();
+
+
+		// Loop through photo co-ords to set map bounds
+
+		for (i = 0; i < track_latlons.length; i++ ) {
+				bounds.extend(track_latlons[i]);			
+		}
+		/*	
+		for (i = 0; i < photo_latlons.length; i++ ) {
+				bounds.extend(photo_latlons[i]);			
+		}
+				*/
+		var d = new Date();
+		report += ', bounds done:' + (d.getTime() - starttime );
+
+		// Create polyline from waypoints 
+		//var track_route = new GPolyline(track_latlons, "#0000FF", 2, 1);
+		
+		// Prepare for encoding!
+		
+		var polylineEncoder = new PolylineEncoder(9,4,0.00001,true);
+		var track_route = polylineEncoder.dpEncodeToGPolyline(track_latlons);
+		
+		
+		var d = new Date();
+		report += ', track done:' + (d.getTime() - starttime );
+		var map = new GMap2(document.getElementById("myMap"),  {mapTypes:[G_HYBRID_MAP]} );
+
+        map.addControl(new GLargeMapControl());
+        map.addControl(new GMapTypeControl());
+		map.addControl(new GScaleControl());
+		//map.enableScrollWheelZoom();
+		//map.addControl(new GOverviewMapControl());
+        map.setCenter(bounds.getCenter());
+		map.setZoom(map.getBoundsZoomLevel(bounds));
+		//map.setMapType(G_HYBRID_MAP);
+		
+		var d = new Date();
+		report += ', map done:' + (d.getTime() - starttime );
+		// Loop through adding photo markers to map
+		
+		for (i = 0; i < photo_latlons.length; i++ ) {
+        	map.addOverlay(createMarker(photo_latlons[i], photo_urls[i].square, photo_urls[i].medium, photo_urls[i].title));
+		}
+		var d = new Date();
+		report += ', photo adding done:' + (d.getTime() - starttime );
+		
+		
+		map.addOverlay(track_route);        
+		//alert(report);
+      }
+    }
+
+    //]]>
+
+    </script>
+
+</head>
+
+<body onload="GetMap();">
+
+<div id="container">
+
+
+
+<div id="primaryContent">
+
+<p class="joke">look, square corners &gt;&gt;&gt;</p>
+<h1><a href="/">rbs.me.uk home</a></h1>
+<h2>Map-a-doodle-doo.</h2>
+<h3>Track: 8.65 miles. Fri 07-12-2007 17:57-20:59.</h3>
+
+	<div id='myMap' style="position:relative; width:700px; height:333px; margin:auto;" ></div>
+
+<h3>Other tracks between 01-10-2007 and 31-12-2007</h3>
+<!--
+<a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
+-->
+<ul id="tracks">
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/1">Track: 6.76 miles</a>
+</h4>
+
+Sun 28-10-2007 09:31-14:22
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/2/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/2">Track: 4.95 miles</a>
+</h4>
+
+Mon 29-10-2007 10:44-14:47
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/3/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/3">Track: 13.17 miles</a>
+</h4>
+
+Tue 30-10-2007 10:56-15:32
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/4/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/4">Track: 9.07 miles</a>
+</h4>
+
+Wed 31-10-2007 10:04-16:06
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/5/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/5">Track: 6.27 miles</a>
+</h4>
+
+Thu 01-11-2007 10:45-15:18
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/6/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/6">Track: 4.90 miles</a>
+</h4>
+
+Thu 01-11-2007 16:30-17:59
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/7/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/7">Track: 99.46 miles</a>
+</h4>
+
+Thu 06-12-2007 11:11-12:19
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/8/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/8">Track: 1.87 miles</a>
+</h4>
+
+Fri 07-12-2007 14:37-16:11
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/9/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/9">Track: 8.65 miles</a>
+</h4>
+
+Fri 07-12-2007 17:57-20:59
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/10/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/10">Track: 1.87 miles</a>
+</h4>
+
+Sat 08-12-2007 09:12-11:15
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/11/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/11">Track: 19.28 miles</a>
+</h4>
+
+Sun 09-12-2007 10:55-11:39
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/12/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/12">Track: 3.34 miles</a>
+</h4>
+
+Tue 25-12-2007 14:47-16:08
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/13/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/13">Track: 24.60 miles</a>
+</h4>
+
+Wed 26-12-2007 05:40-10:56
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/14/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/14">Track: 3.55 miles</a>
+</h4>
+
+Sun 30-12-2007 14:35-16:06
+
+
+</li>
+
+<li>
+
+<h4>
+	<!--
+	<a href="/gps/dates/20071001-20071231/15/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
+-->
+<a href="/gps/dates/20071001-20071231/15">Track: 12.95 miles</a>
+</h4>
+
+Mon 31-12-2007 09:59-16:09
+
+
+</li>
+
+</ul>
+
+
+</div><!-- primaryContent -->
+
+
+<div id="footer">
+<!-- Start of Flickr Badge -->
+
+
+<div id="imageBanner">
+<script type="text/javascript" src="http://www.flickr.com/badge_code_v2.gne?show_name=1&amp;count=8&amp;display=random&amp;size=s&amp;layout=h&amp;source=user&amp;user=38584744%40N00"></script>
+
+</div>
+</div><!-- footer -->
+
+</div><!-- container -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-932633-1";
+urchinTracker();
+</script>
+</body>
+</html>

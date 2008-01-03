@@ -1,0 +1,282 @@
+
+/* - - - - - - - - - - - - - - - - - - - - -
+
+Title : 
+Author : 
+URL : 
+
+Description : 
+
+Created : 
+Modified : 
+
+- - - - - - - - - - - - - - - - - - - - - */
+
+/* ----- CSS ----- */
+
+*{
+}	
+html{
+
+
+
+
+}	
+body{
+	background-color: #CCCCCC;
+	font-family: "Andale Mono","Courier New", monospace;
+}
+
+/* ----- IDS ----- */
+
+#container{
+	width: 768px;
+	background-color: #FFFFFF;
+	margin: auto;
+	margin-top: 0px;
+	padding-top: 0px;
+}	
+
+#mapcontainer{
+	width: 90%;
+	background-color: #FFFFFF;
+	margin: auto;
+	margin-top: 0px;
+	padding-top: 0px;
+}	
+
+#primaryContent{
+}	
+
+#footer{
+}
+#info{
+}
+#myMap{
+	text-align: center;
+	margin: 10px;
+	background-color: #000;
+	position: relative;
+	width: 694px; 
+	height: 400px;
+	border: gray solid 3px;
+}
+
+/* ----- CLASSES ----- */
+
+.hide{
+}
+.show{
+}
+
+/* ----- HEADINGS ----- */
+
+h1{
+	color: red;
+	margin-left: 10px;
+}
+
+h2{
+	color: blue;
+	margin-left: 10px;
+}
+h3{
+	color: #ff9900;
+	margin-left: 10px;
+	line-height: normal;
+}
+h4{
+
+	font-size: 1.6em;
+}
+
+fieldset {
+	font-size: small;
+	color: #ff0099;
+	margin: 0px;
+	padding: 0px;
+
+}
+
+form {
+	margin-left: 10px;
+}
+
+
+.flick {
+	color: #0063dd;
+	font-weight: bold;
+}
+
+
+.arr {
+	color:#ff0084;
+	font-weight: bold;
+}
+
+#twitter {
+
+	margin-right: 10px;
+	margin-left: 10px;
+	border: #999 dashed 2px;
+	font-size: small;
+}   
+
+#my_twitter_status {
+
+}
+
+#my_twitter_status_time {
+	text-align: right;
+	font-style: italic;   
+}
+
+input.textbox {
+	color: #26a;
+	background: #feb;
+	border: #26a solid 1px;
+}
+p{
+	margin: 10px;
+}
+p.waffle {
+	font-size: small;
+	color: #666;
+
+	text-align: justify;
+	line-height: 150%;
+
+}
+p.waffle a {
+	color: #666;
+
+}
+
+div#imageBanner {
+	text-align:  center;
+}
+div#imageBanner a img {
+	border: gray solid 3px;
+	margin: 3px;
+
+}
+div#imageBanner a {
+	border: none;
+}
+
+p.joke {
+	text-align: right;
+	font-size: x-small;
+	color: gray;
+	margin-right: 10px;
+}
+a:link,
+a:visited {
+
+	text-decoration:none;
+	border-bottom-style: dotted;
+	border-bottom-width: 1px;
+	font-weight: bold;
+
+	/* padding-bottom: 1px; */
+
+}
+
+a:hover,
+a:focus,
+a:visited {
+
+	border-bottom-color: #666;
+	border-bottom-style: solid;
+}
+
+a.thumb-img {
+	border:none;
+	font-weight: normal;
+
+}
+
+
+a:link.thumb-img img,
+a:visited.thumb-img img { 
+
+	border: 1px solid #666;
+	padding: 3px;
+}
+
+a:hover.thumb-img img,
+a:focus.thumb-img img,
+a:active.thumb-img img {
+
+	border: 3px solid #666;
+	padding: 1px;
+}
+a.thumb-img span {
+	background: url(../images/camera_go.png) no-repeat 98% 0%;
+	margin:0;
+	padding:2px 20px 2px 2px;	
+	color: black;
+	font-size:0.8em;
+
+}
+a:link.thumb-img span,
+a:visited.thumb-img span { 
+
+	border-bottom:1px dotted black;
+
+}
+
+a:hover.thumb-img span,
+a:focus.thumb-img span,
+a:active.thumb-img span {
+
+	border-bottom: 1px solid black;
+
+}
+
+p.thumb-caption {
+	margin:5px auto 5px auto;
+	font-size: 1em;
+
+}
+
+h1 a, h1 a:link, h1 a:visited {
+	text-decoration: none;
+	color: red;
+	border: none;
+}
+
+h1 a:hover {
+	text-decoration: none;
+	border-bottom: red solid 2px;
+}
+
+ul#works {
+	color: green;
+	font-size: 95%;
+	width:95%;
+	margin: 0 0 0 10px;
+	padding: 0;
+}
+
+ul#works li {
+	display:inline;
+}
+
+ul#works li a {
+	color: green;
+	border-bottom-color: green;
+}
+
+
+/* GPS track listing */
+
+ul#tracks li {
+	list-style: none;
+	font-size: 80%;
+} 
+
+ul#tracks li h4 {
+	display:inline;
+}
+
