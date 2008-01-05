@@ -6,7 +6,7 @@
 <head>
 
 <title>
-8.65 miles of fun
+{{track.length}} miles of fun
 </title>
 <!-- Meta Tags -->
 <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
@@ -58,7 +58,7 @@
 		// and for the track route to build polyline
 		
 		var track_latlons = new Array();
-    	{% for wp in waypoints %}
+    	{% for wp in track.waypoints.all %}
        	track_latlons.push( new GLatLng( {{wp.latitude}}, {{wp.longitude}} ) );
         {% endfor %}
 		report += ', tlength:' + track_latlons.length;
@@ -159,7 +159,7 @@
 <p class="joke">look, square corners &gt;&gt;&gt;</p>
 <h1><a href="/">rbs.me.uk home</a></h1>
 <h2>Map-a-doodle-doo.</h2>
-<h3>Track: 8.65 miles. Fri 07-12-2007 17:57-20:59.</h3>
+<h3>Track: {{track.length}} miles. Fri 07-12-2007 17:57-20:59.</h3>
 
 	<div id='myMap' style="position:relative; width:700px; height:333px; margin:auto;" ></div>
 
@@ -168,7 +168,7 @@
 <a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
 -->
 <ul id="tracks">
-
+{%for t in tracks %}
 <li>
 
 <h4>
@@ -177,237 +177,13 @@
 		<img src="/assets/img/XML.png" alt="XML Icon" />
 	</a>
 -->
-<a href="/gps/dates/20071001-20071231/1">Track: 6.76 miles</a>
+<a href="/gps/dates/20071001-20071231/1">Track: {{t.length}} miles</a>
 </h4>
 
 Sun 28-10-2007 09:31-14:22
-
-
 </li>
+{%endfor%}
 
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/2/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/2">Track: 4.95 miles</a>
-</h4>
-
-Mon 29-10-2007 10:44-14:47
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/3/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/3">Track: 13.17 miles</a>
-</h4>
-
-Tue 30-10-2007 10:56-15:32
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/4/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/4">Track: 9.07 miles</a>
-</h4>
-
-Wed 31-10-2007 10:04-16:06
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/5/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/5">Track: 6.27 miles</a>
-</h4>
-
-Thu 01-11-2007 10:45-15:18
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/6/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/6">Track: 4.90 miles</a>
-</h4>
-
-Thu 01-11-2007 16:30-17:59
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/7/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/7">Track: 99.46 miles</a>
-</h4>
-
-Thu 06-12-2007 11:11-12:19
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/8/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/8">Track: 1.87 miles</a>
-</h4>
-
-Fri 07-12-2007 14:37-16:11
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/9/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/9">Track: 8.65 miles</a>
-</h4>
-
-Fri 07-12-2007 17:57-20:59
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/10/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/10">Track: 1.87 miles</a>
-</h4>
-
-Sat 08-12-2007 09:12-11:15
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/11/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/11">Track: 19.28 miles</a>
-</h4>
-
-Sun 09-12-2007 10:55-11:39
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/12/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/12">Track: 3.34 miles</a>
-</h4>
-
-Tue 25-12-2007 14:47-16:08
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/13/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/13">Track: 24.60 miles</a>
-</h4>
-
-Wed 26-12-2007 05:40-10:56
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/14/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/14">Track: 3.55 miles</a>
-</h4>
-
-Sun 30-12-2007 14:35-16:06
-
-
-</li>
-
-<li>
-
-<h4>
-	<!--
-	<a href="/gps/dates/20071001-20071231/15/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/gps/dates/20071001-20071231/15">Track: 12.95 miles</a>
-</h4>
-
-Mon 31-12-2007 09:59-16:09
-
-
-</li>
 
 </ul>
 

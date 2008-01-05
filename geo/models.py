@@ -6,7 +6,7 @@ class WayPoint(models.Model):
     """(WayPoint description)"""
     latitude = models.FloatField(max_digits=12, decimal_places=9, db_index=True)
     longitude = models.FloatField(max_digits=12, decimal_places=9, db_index=True)
-    altitude = models.FloatField(max_digits=10, decimal_places=6, db_index=True)
+    altitude = models.FloatField(max_digits=11, decimal_places=6, db_index=True)
     time = models.DateTimeField(db_index=True)
     
     class Admin:
@@ -51,18 +51,16 @@ class GpxFile(models.Model):
                     lon = node.getAttribute('lon')
                     
                     # Try get or create here
-                    w = WayPoint()
-                    w.latitude = lat
-                    w.longitude = lon
-                    w.altitude = elestring
-                    
+
                     try:
-                        w.time =  datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ')
+                        w, created = WayPoint.objects.get_or_create(latitude=lat,longitude=lon,altitude=elestring,time=datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ'))
+                        w.save()
+                        self.waypoints.add(w)                        
                     except ValueError:
                         print node.toxml()
+                    except:
+                        print node.toxml()
 
-                    w.save()
-                    self.waypoints.add(w)
                     self.save()
 
 
@@ -72,7 +70,7 @@ class GpxFile(models.Model):
 class Track(models.Model):
     """(Track description)"""
     def __str__(self):
-        return self.name + ' ' + strftime('%Y-%m-%d %H:%M:%S', self.start_time)
+        return self.name + ' ' + self.start_time.strftime('%Y-%m-%d %H:%M:%S')
 
     name        = models.CharField( maxlength=100,db_index=True)
     description = models.CharField(blank=True, maxlength=255)

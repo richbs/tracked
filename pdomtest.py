@@ -27,8 +27,8 @@ setup_environ(settings)
 from tracked.geo.models import Trip, Track, WayPoint, GpxFile
 
 gpx = GpxFile()
-gpx.name = 'My Yorkshire Trip'
-gpx.filename = 'yorkshire.gpx'
+gpx.name = 'My Year Trip'
+gpx.filename = 'neth.gpx'
 gpx.save()
 gpx.process()
 print gpx.waypoints.count()
