@@ -1,9 +1,34 @@
 # Create your views here.
 from datetime import datetime, timedelta
 from django.http import HttpResponse
+from django.shortcuts import render_to_response
 from django.template import Template, Context, loader
-from tracked.geo.models import WayPoint, Track
-import math
+from tracked.geo.models import WayPoint, Track, GpxFile
+from tracked.geo.forms import UploadForm
+
+def upload(request):
+    form = None
+
+    # Typically, we'd do a permissions check here.
+    #if not request.user.has_perm('pix.add_picture'):
+    #    return http.HttpResponseForbidden('You cannot add pictures.')
+
+    if request.POST:
+        post_data = request.POST.copy()
+        post_data.update(request.FILES)
+        form = UploadForm(post_data)
+        if form.is_valid():
+            success = form.save()
+            return HttpResponse('yes')
+        else:
+
+            return render_to_response('upload.html', {'form':form})
+    else:
+        form = UploadForm()
+        return render_to_response('upload.html', {'form':form})
+    
+
+    
 def dates(request,date_from,date_to):
 
     t = loader.get_template('dates.html')
@@ -86,27 +111,3 @@ def dates(request,date_from,date_to):
     })
     return HttpResponse(t.render(c))
     
-    
-def get_distance( wp1, wp2):
-        '''Returns the distance between two points on the earth.
-
-        Inputs used are:
-            Longitude (in radians) of the first location,
-            Latitude (in radians) of the first location,
-            Longitude (in radians) of the second location, and
-            Latitude (in radians) of the second location.
-        To convert to radians (from degrees), use pythons math.radian function (Note: already done 
-        for you in the constructor above).  Returns the distance in miles.'''
-
-        long_1 = math.radians(float(wp1.longitude))
-        lat_1  = math.radians(float(wp1.latitude))
-
-        long_2 = math.radians(float(wp2.longitude))
-        lat_2  = math.radians(float(wp2.latitude))
-
-        dlong = long_2 - long_1
-        dlat = lat_2 - lat_1
-        a = (math.sin(dlat / 2))**2 + math.cos(lat_1) * math.cos(lat_2) * (math.sin(dlong / 2))**2
-        c = 2 * math.asin(min(1, math.sqrt(a)))
-        dist = 3956 * c
-        return round( dist, 5)

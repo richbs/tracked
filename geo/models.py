@@ -1,6 +1,9 @@
 from django.db import models
 from xml.dom import pulldom
 from datetime import datetime
+from tracked.geo.helpers import get_distance
+from tracked.settings import MEDIA_ROOT
+
 # Create your models here.
 class WayPoint(models.Model):
     """(WayPoint description)"""
@@ -13,9 +16,26 @@ class WayPoint(models.Model):
         pass
 
     def __str__(self):
-                return str(self.altitude) + ' ' + self.time.strftime('%Y-%m-%d %H:%M:%S')
+        return str(self.altitude) + ' ' + self.time.strftime('%Y-%m-%d %H:%M:%S')
 
 
+class Track(models.Model):
+    """(Track description)"""
+    def __str__(self):
+        return self.name + ' ' + self.start_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    name        = models.CharField( maxlength=100,db_index=True)
+    description = models.CharField(blank=True, maxlength=255)
+    start_time  = models.DateTimeField(db_index=True)
+    end_time    = models.DateTimeField(db_index=True)
+    length = models.FloatField(max_digits=10, decimal_places=5)
+    waypoints   = models.ManyToManyField(WayPoint)
+
+    class Admin:
+        pass
+
+
+# Trips and GPX files should inherit same class
 class GpxFile(models.Model):
     """
     The record of the XML file uploaded.
@@ -29,12 +49,85 @@ class GpxFile(models.Model):
     description = models.CharField(blank=True, maxlength=255)
     filename    = models.FileField(upload_to='xml')
     waypoints   = models.ManyToManyField(WayPoint)
+    tracks      = models.ManyToManyField(Track)
 
-    def process(self):
+    def createTracks(self, min_interval, max_interval, min_length):
+        """
+        min_interval    = 60
+        max_interval    = 3500
+        min_length      = 1        
+        """
+        distance        = 0
+        previous        = False
+        track = Track()
+        track.length = 0
+        # assert False, dir(self.waypoints.all()[0])
+        first_wp = self.waypoints.all()[0]
+        track.start_time = first_wp.time
+        track.end_time = first_wp.time
+        track.name = ''
+        track.description = ''
+        track.save()
+        for wp in self.waypoints.all():
+
+            too_long    = False
+            too_far     = False
+            too_short   = False
+
+            if not previous:
+                track.start_time = wp.time             
+                track.waypoints.add( wp )
+                previous = wp
+            else:
+                secs_elapsed = wp.time - previous.time
+                if secs_elapsed.seconds > max_interval:
+                    too_long = True
+
+                if secs_elapsed.seconds < min_interval:
+                    too_short = True
+
+                if too_long:
+                    # Create track here
+
+                    track.length    = distance
+                    #assert False, len(tracks)
+                    track.end_time  = previous.time
+                    track.save()
+
+                    if distance > min_length:
+                        self.tracks.add(track)
+
+                    track = Track()
+                    track.length = 0
+                    track.start_time = wp.time
+                    track.end_time = wp.time
+                    track.name = ''
+                    track.description = ''
+                    track.save()
+                    previous = False
+                    distance = 0
+                    track.waypoints.add(wp)
+                    previous = wp
+                elif too_short:
+                    previous = previous
+                else:
+                    distance += get_distance(previous,wp)
+                    track.waypoints.add(wp)
+                    previous = wp
+
+        track.length   =  round(distance,5)
+        track.end_time    = previous.time
+        track.save()
+
+        if distance > min_length:
+            self.tracks.add(track)                
+
+
+    def processXML(self):
         """
         Convert XML points to WayPoint nodes
         """
-        gpxlog = pulldom.parse(self.filename)
+        gpxlog = pulldom.parse(MEDIA_ROOT +  self.filename)
 
         for event,node in gpxlog:
             # Only construct a dom from the track points
@@ -62,25 +155,9 @@ class GpxFile(models.Model):
                         print node.toxml()
 
                     self.save()
-
-
+                    
                 else:
                     pass # This is not a active log way point
-
-class Track(models.Model):
-    """(Track description)"""
-    def __str__(self):
-        return self.name + ' ' + self.start_time.strftime('%Y-%m-%d %H:%M:%S')
-
-    name        = models.CharField( maxlength=100,db_index=True)
-    description = models.CharField(blank=True, maxlength=255)
-    start_time  = models.DateTimeField(db_index=True)
-    end_time    = models.DateTimeField(db_index=True)
-    length = models.FloatField(max_digits=10, decimal_places=5)
-    waypoints   = models.ManyToManyField(WayPoint)
-
-    class Admin:
-        pass
 
 class Trip(models.Model):
     def __str__(self):
@@ -96,7 +173,6 @@ class Trip(models.Model):
     
     class Admin:
         pass
-
 
 
     
