@@ -35,7 +35,7 @@ class UploadForm(forms.Form):
         g.name = self.clean_data['name']
         g.description = self.clean_data['description']
         g.filename =  'xml/' + xml_filename
-        g.save()
+        g.save()        
         g.processXML()
         g.createTracks(60,3500,1)
         return True

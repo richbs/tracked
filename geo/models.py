@@ -61,7 +61,7 @@ class GpxFile(models.Model):
         previous        = False
         track = Track()
         track.length = 0
-        # assert False, dir(self.waypoints.all()[0])
+        # assert False, self.waypoints.all()
         first_wp = self.waypoints.all()[0]
         track.start_time = first_wp.time
         track.end_time = first_wp.time
@@ -89,7 +89,7 @@ class GpxFile(models.Model):
                 if too_long:
                     # Create track here
 
-                    track.length    = distance
+                    track.length    = round(distance,5)
                     #assert False, len(tracks)
                     track.end_time  = previous.time
                     track.save()
@@ -150,8 +150,6 @@ class GpxFile(models.Model):
                         w.save()
                         self.waypoints.add(w)                        
                     except ValueError:
-                        print node.toxml()
-                    except:
                         print node.toxml()
 
                     self.save()

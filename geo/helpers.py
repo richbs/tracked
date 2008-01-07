@@ -22,4 +22,4 @@ def get_distance( wp1, wp2):
         a = (math.sin(dlat / 2))**2 + math.cos(lat_1) * math.cos(lat_2) * (math.sin(dlong / 2))**2
         c = 2 * math.asin(min(1, math.sqrt(a)))
         dist = 3956 * c
-        return round( dist, 5)
+        return dist

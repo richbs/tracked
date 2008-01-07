@@ -27,8 +27,13 @@ def upload(request):
         form = UploadForm()
         return render_to_response('upload.html', {'form':form})
     
-
+def show_track(request, track_id):
     
+    
+    track = Track.objects.filter(id=track_id)[0]
+
+    return render_to_response('track.html', {'track':track})
+
 def dates(request,date_from,date_to):
 
     t = loader.get_template('dates.html')
