@@ -30,7 +30,7 @@ body{
 /* ----- IDS ----- */
 
 #container{
-	width: 768px;
+	width: 95%;
 	background-color: #FFFFFF;
 	margin: auto;
 	margin-top: 0px;
@@ -57,8 +57,8 @@ body{
 	margin: 10px;
 	background-color: #000;
 	position: relative;
-	width: 694px; 
-	height: 400px;
+	width: 95%; 
+	height: 80%;
 	border: gray solid 3px;
 }
 

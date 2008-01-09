@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import Template, Context, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
-from tracked.geo.forms import UploadForm
+from tracked.geo.forms import UploadForm, UploadFormTwo
 
 def upload(request):
     form = None
@@ -14,17 +14,19 @@ def upload(request):
     #    return http.HttpResponseForbidden('You cannot add pictures.')
 
     if request.POST:
-        post_data = request.POST.copy()
-        post_data.update(request.FILES)
-        form = UploadForm(post_data)
+
+        form = UploadFormTwo(request.POST,request.FILES)
+
         if form.is_valid():
-            success = form.save()
+            g = form.save()
+            g.processXML()
+            g.createTracks(60,3500,1)
             return HttpResponse('yes')
         else:
 
             return render_to_response('upload.html', {'form':form})
     else:
-        form = UploadForm()
+        form = UploadFormTwo()
         return render_to_response('upload.html', {'form':form})
     
 def show_track(request, track_id):

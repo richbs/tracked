@@ -7,9 +7,9 @@ from tracked.settings import MEDIA_ROOT
 # Create your models here.
 class WayPoint(models.Model):
     """(WayPoint description)"""
-    latitude = models.FloatField(max_digits=12, decimal_places=9, db_index=True)
-    longitude = models.FloatField(max_digits=12, decimal_places=9, db_index=True)
-    altitude = models.FloatField(max_digits=11, decimal_places=6, db_index=True)
+    latitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
+    longitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
+    altitude = models.DecimalField(max_digits=12, decimal_places=7, db_index=True)
     time = models.DateTimeField(db_index=True)
     
     class Admin:
@@ -24,11 +24,11 @@ class Track(models.Model):
     def __str__(self):
         return self.name + ' ' + self.start_time.strftime('%Y-%m-%d %H:%M:%S')
 
-    name        = models.CharField( maxlength=100,db_index=True)
-    description = models.CharField(blank=True, maxlength=255)
+    name        = models.CharField( max_length=100,db_index=True)
+    description = models.CharField(blank=True, max_length=255)
     start_time  = models.DateTimeField(db_index=True)
     end_time    = models.DateTimeField(db_index=True)
-    length = models.FloatField(max_digits=10, decimal_places=5)
+    length = models.DecimalField(max_digits=10, decimal_places=5)
     waypoints   = models.ManyToManyField(WayPoint)
 
     class Admin:
@@ -45,8 +45,8 @@ class GpxFile(models.Model):
         """docstring for Admin"""
         pass
             
-    name        = models.CharField(blank=True, maxlength=100)
-    description = models.CharField(blank=True, maxlength=255)
+    name        = models.CharField(blank=True, max_length=100)
+    description = models.CharField(blank=True, max_length=255)
     filename    = models.FileField(upload_to='xml')
     waypoints   = models.ManyToManyField(WayPoint)
     tracks      = models.ManyToManyField(Track)
@@ -58,17 +58,20 @@ class GpxFile(models.Model):
         min_length      = 1        
         """
         distance        = 0
+        ascent          = 0
+        descent         = 0
         previous        = False
         track = Track()
         track.length = 0
+        waypoints = self.waypoints.all().order_by("time")
         # assert False, self.waypoints.all()
-        first_wp = self.waypoints.all()[0]
+        first_wp = waypoints[0]
         track.start_time = first_wp.time
         track.end_time = first_wp.time
         track.name = ''
         track.description = ''
         track.save()
-        for wp in self.waypoints.all():
+        for wp in waypoints:
 
             too_long    = False
             too_far     = False
@@ -80,9 +83,9 @@ class GpxFile(models.Model):
                 previous = wp
             else:
                 secs_elapsed = wp.time - previous.time
-                if secs_elapsed.seconds > max_interval:
+                if secs_elapsed.seconds > max_interval or secs_elapsed.days > 0:
                     too_long = True
-
+                    #assert False, [wp,previous,secs_elapsed.seconds,max_interval]
                 if secs_elapsed.seconds < min_interval:
                     too_short = True
 
@@ -106,6 +109,8 @@ class GpxFile(models.Model):
                     track.save()
                     previous = False
                     distance = 0
+                    ascent          = 0
+                    descent         = 0                    
                     track.waypoints.add(wp)
                     previous = wp
                 elif too_short:
@@ -151,7 +156,6 @@ class GpxFile(models.Model):
                         self.waypoints.add(w)                        
                     except ValueError:
                         print node.toxml()
-
                     self.save()
                     
                 else:
@@ -162,11 +166,11 @@ class Trip(models.Model):
         return "Trip"
         
     """(Trip description)"""
-    name        = models.CharField( maxlength=100)
-    description = models.CharField(blank=True, maxlength=255)
+    name        = models.CharField( max_length=100)
+    description = models.CharField(blank=True, max_length=255)
     start_time  = models.DateTimeField(db_index=True)
     end_time    = models.DateTimeField(db_index=True)
-    length = models.FloatField(max_digits=10, decimal_places=5)
+    length = models.DecimalField(max_digits=10, decimal_places=5)
     tracks = models.ManyToManyField(Track)
     
     class Admin:
