@@ -32,13 +32,10 @@ def upload(request):
         return render_to_response('upload.html', {'form':form})
     
 def show_track(request, track_id):
-    # there it is!
-    timeob2 = datetime(2007,8,26,18,33,0,0,tzinfo=UTC)
-    timo = time.mktime( timeob2.timetuple() )
-    assert False, time.localtime(timo)
     track   = Track.objects.filter(id=track_id)[0]
     gpxfile = track.gpxfile_set.all()[0]
-    return render_to_response('track.html', {'track':track, 'gpxfile':gpxfile,'datum':timeob2 }
+    wps = track.waypoints.order_by('localtime')
+    return render_to_response('track.html', {'track':track, 'gpxfile':gpxfile, 'waypoints':wps}
     
     )
 

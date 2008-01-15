@@ -55,7 +55,7 @@
 		// and for the track route to build polyline
 		
 		var track_latlons = new Array();
-    	{% for wp in track.waypoints.all %}
+    	{% for wp in waypoints %}
        	track_latlons.push( new GLatLng( {{wp.latitude}}, {{wp.longitude}} ) );
         {% endfor %}
 		report += ', tlength:' + track_latlons.length;
@@ -145,7 +145,7 @@
 
 </head>
 
-<body onload="GetMap();">
+<body class="map" onload="GetMap();">
 
 <div id="container">
 
@@ -153,16 +153,15 @@
 
 <p class="joke">look, square corners &gt;&gt;&gt;</p>
 <div id="info">
-<h1>Map-a-doodle-doo.  {{datum|date:"D M jS H:i"}}</h1>
-<h2>Track: {{track.length|floatformat:2}} miles. {{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h2>
-<table>
+<h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
+<table class="stats">
     <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}} miles</td></tr>
     <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
     <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
     <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
     <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
 </table>
-<h3>Other tracks in file {{gpxfile.filename}}</h3>
+<h2>Other tracks in file {{gpxfile.name}}</h2>
 <ul id="tracks">
 {%for t in gpxfile.tracks.all %}
 <li>
@@ -171,8 +170,7 @@
 		<img src="/assets/img/XML.png" alt="XML Icon" />
 	</a>
 -->
-<a href="/track/{{t.id}}">{{t.name|default:"Track" }}: {{t.length|floatformat:2}} miles</a>
-{{t.start_time|date:"D M jS H:i"}}-{{t.end_time|date:"H:i"}}
+<a href="/track/{{t.id}}">{{t.start_time|date:"D M jS H:i"}}-{{t.end_time|date:"H:i"}}</a> {{t.length|floatformat:2}} miles
 </li>
 {%endfor%}
 
