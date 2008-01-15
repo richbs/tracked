@@ -6,7 +6,7 @@
 <head>
 
 <title>
-{{track.length}} miles of fun
+{{track.name}} - {{track.length|floatformat:2}} miles of fun
 </title>
 <!-- Meta Tags -->
 <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
@@ -33,13 +33,10 @@
  <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
 
 <script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
-
-
 <script type="text/javascript" src="/assets/js/mootools.js"></script>
 <script type="text/javascript" src="/assets/js/slimbox.js"></script>
 
 <script type="text/javascript">
-	
 	
 	var d = new Date();
     //<![CDATA[
@@ -152,40 +149,43 @@
 
 <div id="container">
 
-
-
 <div id="primaryContent">
 
 <p class="joke">look, square corners &gt;&gt;&gt;</p>
-<h1><a href="/">rbs.me.uk home</a></h1>
-<h2>Map-a-doodle-doo.</h2>
-<h3>Track: {{track.length}} miles. Fri 07-12-2007 17:57-20:59.</h3>
-
-	<div id='myMap' style="position:relative; width:90%; height:500px; margin:auto;" ></div>
-
-<h3>Other tracks between 01-10-2007 and 31-12-2007</h3>
-<!--
-<a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
--->
+<div id="info">
+<h1>Map-a-doodle-doo.  {{datum|date:"D M jS H:i"}}</h1>
+<h2>Track: {{track.length|floatformat:2}} miles. {{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h2>
+<table>
+    <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}} miles</td></tr>
+    <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
+</table>
+<h3>Other tracks in file {{gpxfile.filename}}</h3>
 <ul id="tracks">
-{%for t in tracks %}
+{%for t in gpxfile.tracks.all %}
 <li>
-
-<h4>
 	<!--
 	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
 		<img src="/assets/img/XML.png" alt="XML Icon" />
 	</a>
 -->
-<a href="/gps/dates/20071001-20071231/1">Track: {{t.length}} miles</a>
-</h4>
-
-Sun 28-10-2007 09:31-14:22
+<a href="/track/{{t.id}}">{{t.name|default:"Track" }}: {{t.length|floatformat:2}} miles</a>
+{{t.start_time|date:"D M jS H:i"}}-{{t.end_time|date:"H:i"}}
 </li>
 {%endfor%}
 
 
 </ul>
+</div>
+	<div id="myMap"></div>
+
+
+<!--
+<a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
+-->
+
 
 
 </div><!-- primaryContent -->

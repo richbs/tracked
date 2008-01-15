@@ -38,7 +38,6 @@ body{
 }	
 
 #mapcontainer{
-	width: 90%;
 	background-color: #FFFFFF;
 	margin: auto;
 	margin-top: 0px;
@@ -49,17 +48,21 @@ body{
 }	
 
 #footer{
+    clear:left;
 }
 #info{
+width:33%;
+float:left;
 }
 #myMap{
+
 	text-align: center;
-	margin: 10px;
 	background-color: #000;
 	position: relative;
-	width: 95%; 
-	height: 80%;
+	width: 65%; 
+	height: 500px;
 	border: gray solid 3px;
+	margin:0 0 0 33%;
 }
 
 /* ----- CLASSES ----- */
@@ -102,7 +105,9 @@ form {
 	margin-left: 10px;
 }
 
-
+table {
+    border-collapse:collapse;
+}
 .flick {
 	color: #0063dd;
 	font-weight: bold;

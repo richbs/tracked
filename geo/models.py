@@ -1,7 +1,7 @@
 from django.db import models
 from xml.dom import pulldom
 from datetime import datetime
-from tracked.geo.helpers import get_distance
+from tracked.geo.helpers import get_distance, UTC
 from tracked.settings import MEDIA_ROOT
 
 # Create your models here.
@@ -29,8 +29,15 @@ class Track(models.Model):
     start_time  = models.DateTimeField(db_index=True)
     end_time    = models.DateTimeField(db_index=True)
     length = models.DecimalField(max_digits=10, decimal_places=5)
+    ascent = models.DecimalField(max_digits=10, decimal_places=5)
+    descent = models.DecimalField(max_digits=10, decimal_places=5)
+    altitude_max = models.DecimalField(max_digits=10, decimal_places=5)
+    altitude_min = models.DecimalField(max_digits=10, decimal_places=5)
     waypoints   = models.ManyToManyField(WayPoint)
-
+    
+    def update_data(self):
+        pass
+    
     class Admin:
         pass
 
@@ -57,20 +64,32 @@ class GpxFile(models.Model):
         max_interval    = 3500
         min_length      = 1        
         """
-        distance        = 0
+        # Our waypoints for this jaunt
+        waypoints = self.waypoints.all().order_by("time")
+
+        # Set up accumulating variables
+        length          = 0
         ascent          = 0
         descent         = 0
+        altitude_max    = 0
+        altitude_min    = 1000
         previous        = False
-        track = Track()
-        track.length = 0
-        waypoints = self.waypoints.all().order_by("time")
-        # assert False, self.waypoints.all()
+        # Create first track and 0 out variables
+        track           = Track()
+        track.name      = ''
+        track.description   = ''
+        track.length        = 0
+        track.ascent          = 0
+        track.descent         = 0
+        track.altitude_max    = 0
+        track.altitude_min    = 1000
+        # Set the first times on the trap
         first_wp = waypoints[0]
         track.start_time = first_wp.time
         track.end_time = first_wp.time
-        track.name = ''
-        track.description = ''
         track.save()
+
+        # Loop through waypoints and measure distances
         for wp in waypoints:
 
             too_long    = False
@@ -90,43 +109,82 @@ class GpxFile(models.Model):
                     too_short = True
 
                 if too_long:
+                    
                     # Create track here
-
-                    track.length    = round(distance,5)
-                    #assert False, len(tracks)
+                    track.length    = round(length,5)
+                    track.ascent    = round(ascent,5)
+                    track.descent   = round(descent,5)
+                    track.altitude_max = round(altitude_max,5)
+                    track.altitude_min = round(altitude_min,5)
                     track.end_time  = previous.time
+                    # maybe pop off waypoint first and last here then write a function for track to update itself
+                    track.waypoints.all().order_by('time')[0].delete()
+                    track.waypoints.all().order_by('-time')[0].delete()
                     track.save()
-
-                    if distance > min_length:
+                    
+                    # Add track if it's long enough
+                    if length > min_length:
                         self.tracks.add(track)
-
-                    track = Track()
-                    track.length = 0
-                    track.start_time = wp.time
-                    track.end_time = wp.time
-                    track.name = ''
-                    track.description = ''
+                    else:
+                        track.delete()
+                    
+                    # Create first track and 0 out variables
+                    track               = Track()
+                    track.name          = ''
+                    track.description   = ''
+                    track.length        = 0
+                    track.ascent        = 0
+                    track.descent       = 0
+                    track.altitude_max  = 0
+                    track.altitude_min  = 1000
+                    track.start_time    = wp.time
+                    track.end_time      = wp.time
                     track.save()
-                    previous = False
-                    distance = 0
+                    
+                    # Set up accumulating variables
+                    previous        = False
+                    length          = 0
                     ascent          = 0
-                    descent         = 0                    
+                    descent         = 0
+                    altitude_max    = 0
+                    altitude_min    = 1000                    
                     track.waypoints.add(wp)
                     previous = wp
                 elif too_short:
                     previous = previous
                 else:
-                    distance += get_distance(previous,wp)
+                    length += get_distance(previous,wp)
+                    
+                    #Only do altitude calculations after second waypoint
+                    if track.waypoints.count() > 1:
+                        #assert False, [wp.altitude,previous.altitude]
+                        # If there's an ascent, add it
+                        if wp.altitude > previous.altitude:
+                            ascent  += (wp.altitude - previous.altitude)
+                        else:
+                            descent += (previous.altitude - wp.altitude)
+                        # Check if we have a new high
+                        if wp.altitude > altitude_max:
+                            altitude_max = wp.altitude
+                        # Check if we have a new low
+                        if wp.altitude < altitude_min:
+                            altitude_min = wp.altitude
+
                     track.waypoints.add(wp)
                     previous = wp
 
-        track.length   =  round(distance,5)
+        track.length    = round(length,5)
+        track.ascent    = round(ascent,5)
+        track.descent   = round(descent,5)
+        track.altitude_max = round(altitude_max,5)
+        track.altitude_min = round(altitude_min,5)
         track.end_time    = previous.time
         track.save()
 
-        if distance > min_length:
+        if length > min_length:
             self.tracks.add(track)                
-
+        else:
+            track.delete()
 
     def processXML(self):
         """
@@ -147,11 +205,13 @@ class GpxFile(models.Model):
                     elestring = ''.join([x.nodeValue for x in elenode[0].childNodes])
                     lat = node.getAttribute('lat')
                     lon = node.getAttribute('lon')
-                    
+                    #timeob2 = datetime(2007,8,26,18,33,0,0,tzinfo=UTC)
+                    timeob = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ')
+                    #timeob = timeob.replace(tzinfo=UTC)
+                    #assert False, timeob2
                     # Try get or create here
-
                     try:
-                        w, created = WayPoint.objects.get_or_create(latitude=lat,longitude=lon,altitude=elestring,time=datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ'))
+                        w, created = WayPoint.objects.get_or_create(latitude=lat,longitude=lon,altitude=elestring,time=timeob)
                         w.save()
                         self.waypoints.add(w)                        
                     except ValueError:

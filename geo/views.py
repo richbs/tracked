@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from tracked.geo.helpers import UTC
 from django.template import Template, Context, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
 from tracked.geo.forms import UploadForm, UploadFormTwo
@@ -31,10 +32,12 @@ def upload(request):
     
 def show_track(request, track_id):
     
+    timeob2 = datetime(2007,8,26,18,33,0,0,tzinfo=UTC)
+    track   = Track.objects.filter(id=track_id)[0]
+    gpxfile = track.gpxfile_set.all()[0]
+    return render_to_response('track.html', {'track':track, 'gpxfile':gpxfile,'datum':timeob2 }
     
-    track = Track.objects.filter(id=track_id)[0]
-
-    return render_to_response('track.html', {'track':track})
+    )
 
 def dates(request,date_from,date_to):
 
