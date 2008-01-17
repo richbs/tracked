@@ -33,7 +33,7 @@ def upload(request):
     
 def show_track(request, track_id):
     track   = Track.objects.get(id=track_id)
-    assert False, track.get_photos()
+    # track.get_photos()
     
     gpxfile = track.gpxfile_set.all()[0]
     wps = track.waypoints.order_by('localtime')
