@@ -3,7 +3,8 @@ from xml.dom import pulldom
 from datetime import datetime
 import time
 from tracked.geo.helpers import get_distance, UTC
-from tracked.settings import MEDIA_ROOT
+from tracked.settings import MEDIA_ROOT, FLICKR_KEY
+import flickrapi
 
 # Create your models here.
 class WayPoint(models.Model):
@@ -35,7 +36,17 @@ class Track(models.Model):
     altitude_max = models.DecimalField(max_digits=10, decimal_places=5)
     altitude_min = models.DecimalField(max_digits=10, decimal_places=5)
     waypoints   = models.ManyToManyField(WayPoint)
-    
+    def get_photos(self, flickr_user="38584744@N00"):
+        
+        flickr = flickrapi.FlickrAPI(FLICKR_KEY)
+        result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time, min_taken_date=self.start_time,extras='date_taken')
+        return [
+                        result.xml,
+        result.photos[0].photo[0]['datetaken'],
+
+                self.end_time,
+                self.start_time ]
+                
     def update_data(self):
         
         # Set up accumulating variables

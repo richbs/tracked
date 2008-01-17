@@ -26,3 +26,4 @@ def get_distance( wp1, wp2):
     c = 2 * math.asin(min(1, math.sqrt(a)))
     dist = 3956 * c
     return dist
+

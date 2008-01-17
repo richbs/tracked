@@ -79,9 +79,9 @@ form {
 table.stats {
     border-collapse: collapse;
     margin: 0 20px 0 20px;
-    width:66%;
+    width:85%;
     font-family:monospace;
-    background-color:yellow;
+    background-color:#FF9;
 }
 table.stats th {
 
