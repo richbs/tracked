@@ -1,15 +1,24 @@
 /* ----- CSS ----- */
 
 body {
-    background-color: #CCCCCC;
+    background-color: #fff;
+/*
     font-family: "Andale Mono","Courier New", monospace;
+    */
+    font-family: Georgia, Times, serif;
     padding: 0;
-    background: #ccc url(../img/back_strip.png) repeat-x  top;
+    background: #fff url(../img/back_strip6.png) repeat-x  top;
     text-align: left;
+    color:#333;
 }
 
 /* ----- IDS ----- */
 
+.home #container {
+    
+    width:736px;
+    
+}
 #container {
     width: 95%;
     background-color: #FFFFFF;
@@ -37,7 +46,6 @@ body {
 
 #info {
     width: 220px;
-    background-color:#eee;
     padding:0 5px 0 5px;
     margin: 0 0 0 0 ;
     position:absolute;
@@ -66,15 +74,14 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 h1 {
-    color: red;
+
     font-size: 140%;
     padding:5px 0 5px 0;
 }
 
 h2 {
     font-size: 100%;
-    color: blue;
-    padding:3px 0 3px 0;    
+    padding:5px 0 5px 0;    
 }
 h3 {
     color: #ff9900;
@@ -99,7 +106,6 @@ table.stats {
     border-collapse: collapse;
     margin: 0 20px 0 20px;
     width:180px;
-    font-family:monospace;
     background-color:#FFD;
 }
 table.stats th {
@@ -111,11 +117,12 @@ table.stats th {
     color:#333;
 }
 table.stats td {
-    width:50%;
+    width:40%;
     padding: 3px 3px 3px 3px;
     border: 1px solid #999;
     text-align: left;
-    font-size: 90%
+    font-size: 90%;
+    font-family:monospace;
 }
 .flick {
     color: #0063dd;
@@ -180,19 +187,24 @@ p.joke {
 }
 a:link,
 a:visited {
-    text-decoration: none;
-    border-bottom-style: dotted;
-    border-bottom-width: 1px;
-    font-weight: bold;
+ 
+    color:inherit;
 
-    /* padding-bottom: 1px; */
 }
 
 a:hover,
-a:focus,
-a:visited {
+a:focus {
+    text-decoration: none;
+    color:#999;
+    padding-bottom: 1px;    
+}
+
+a:active {
+    /*
     border-bottom-color: #666;
     border-bottom-style: solid;
+    */
+    color:inherit;
 }
 
 a.thumb-img {

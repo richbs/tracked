@@ -11,7 +11,7 @@ from tracked.geo.forms import UploadForm, UploadFormTwo
 
 
 def home_page(request):
-     return HttpResponse('MyTracks.net')
+    return render_to_response('index.html')
 
 def upload(request):
     form = None
