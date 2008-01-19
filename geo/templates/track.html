@@ -163,14 +163,14 @@
 </table>
 <h2>Other tracks in file {{gpxfile.name}}</h2>
 <ul id="tracks">
-{%for t in gpxfile.tracks.all %}
+{%for t in gpxfile.track_set.all %}
 <li>
 	<!--
 	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
 		<img src="/assets/img/XML.png" alt="XML Icon" />
 	</a>
 -->
-<a href="/track/{{t.id}}">{{t.start_time|date:"D M jS H:i"}}-{{t.end_time|date:"H:i"}}</a> {{t.length|floatformat:2}} miles
+<a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}-{{t.end_time|date:"H:i"}}</a> {{t.length|floatformat:2}} miles
 </li>
 {%endfor%}
 

@@ -4,6 +4,7 @@ body {
     background-color: #CCCCCC;
     font-family: "Andale Mono","Courier New", monospace;
     padding: 0;
+    background: #ccc url(../img/back_strip.png) repeat-x  top;
 }
 
 /* ----- IDS ----- */
