@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import time
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.newforms.extras import SelectDateWidget
 from tracked.geo.helpers import UTC
 from django.template import Template, Context, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
@@ -10,7 +11,7 @@ from tracked.geo.forms import UploadForm, UploadFormTwo
 
 
 def home_page(request):
-    pass
+     return HttpResponse('MyTracks.net')
 
 def upload(request):
     form = None

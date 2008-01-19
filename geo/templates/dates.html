@@ -115,7 +115,7 @@
 		
 		var d = new Date();
 		report += ', track done:' + (d.getTime() - starttime );
-		var map = new GMap2(document.getElementById("myMap"),  {mapTypes:[G_HYBRID_MAP]} );
+		var map = new GMap2(document.getElementById("map"),  {mapTypes:[G_HYBRID_MAP]} );
 
         map.addControl(new GLargeMapControl());
         map.addControl(new GMapTypeControl());
@@ -161,7 +161,7 @@
 <h2>Map-a-doodle-doo.</h2>
 <h3>Track: {{track.length}} miles. Fri 07-12-2007 17:57-20:59.</h3>
 
-	<div id='myMap' style="position:relative; width:700px; height:333px; margin:auto;" ></div>
+	<div id="map" style="position:relative; width:700px; height:333px; margin:auto;" ></div>
 
 <h3>Other tracks between 01-10-2007 and 31-12-2007</h3>
 <!--
@@ -194,11 +194,7 @@ Sun 28-10-2007 09:31-14:22
 <div id="footer">
 <!-- Start of Flickr Badge -->
 
-
-<div id="imageBanner">
-<script type="text/javascript" src="http://www.flickr.com/badge_code_v2.gne?show_name=1&amp;count=8&amp;display=random&amp;size=s&amp;layout=h&amp;source=user&amp;user=38584744%40N00"></script>
-
-</div>
+<p>Footer</p>
 </div><!-- footer -->
 
 </div><!-- container -->

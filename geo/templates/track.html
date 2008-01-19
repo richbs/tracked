@@ -20,29 +20,22 @@
 <link rel="shortcut icon" href="" />
 -->
 <!-- CSS -->
-
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.3.1/build/reset-fonts-grids/reset-fonts-grids.css" />
 <link rel="stylesheet" href="{{MEDIA_URL}}/assets/css/rbstyle.css" type="text/css" />
-<!--
-	<link rel="stylesheet" href="/styles/default.css" media="screen,projection" type="text/css" />
--->
-<link rel="stylesheet" href="/assets/js/slimbox.css" media="screen,projection" type="text/css" />
 
 <!-- JavaScript -->
 
-
- <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
 
 <script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
-<script type="text/javascript" src="/assets/js/mootools.js"></script>
-<script type="text/javascript" src="/assets/js/slimbox.js"></script>
-
+<script type="text/javascript" src="/assets/js/jquery.js"></script>
 <script type="text/javascript">
 	
 	var d = new Date();
     //<![CDATA[
 	var starttime = d.getTime();
 	var report =  'starting:' + d.getTime();
-    function GetMap() {
+    $('#map').ready( function() {
       if (GBrowserIsCompatible()) {
         
 		// Create an array of the Glatlngs for this track's photos
@@ -112,7 +105,7 @@
 		
 		var d = new Date();
 		report += ', track done:' + (d.getTime() - starttime );
-		var map = new GMap2(document.getElementById("myMap"),  {mapTypes:[G_HYBRID_MAP]} );
+		var map = new GMap2(document.getElementById("map"),  {mapTypes:[G_HYBRID_MAP]} );
 
         map.addControl(new GLargeMapControl());
         map.addControl(new GMapTypeControl());
@@ -137,48 +130,49 @@
 		map.addOverlay(track_route);        
 		//alert(report);
       }
-    }
+    })
 
     //]]>
 
-    </script>
+</script>
 
 </head>
 
-<body class="map" onload="GetMap();">
+<body class="map">
 
 <div id="container">
 
-<div id="primaryContent">
+<div id="primary-content">
+	<div id="map"></div>
+    <div id="info">
+    <h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
+    <table class="stats">
+        <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
+        <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
+        <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
+        <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
+        <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
+    </table>
+    <h2>Other tracks in file {{gpxfile.name}}</h2>
+    <ul id="tracks">
+    {%for t in gpxfile.track_set.all %}
+    <li>
+    	<!--
+    	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
+    		<img src="/assets/img/XML.png" alt="XML Icon" />
+    	</a>
+    -->
+    <a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}
+        <!--
+        -{{t.end_time|date:"H:i"}}
+            -->
+    </a> [{{t.length|floatformat:2}}M]
+    </li>
+    {%endfor%}
 
-<p class="joke">look, square corners &gt;&gt;&gt;</p>
-<div id="info">
-<h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
-<table class="stats">
-    <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}} miles</td></tr>
-    <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
-    <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
-    <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
-    <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
-</table>
-<h2>Other tracks in file {{gpxfile.name}}</h2>
-<ul id="tracks">
-{%for t in gpxfile.track_set.all %}
-<li>
-	<!--
-	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}-{{t.end_time|date:"H:i"}}</a> {{t.length|floatformat:2}} miles
-</li>
-{%endfor%}
 
-
-</ul>
-</div>
-	<div id="myMap"></div>
-
+    </ul>
+    </div>
 
 <!--
 <a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
@@ -192,11 +186,13 @@
 <div id="footer">
 <!-- Start of Flickr Badge -->
 
-
+<p>Footer</p>
+<!--
 <div id="imageBanner">
 <script type="text/javascript" src="http://www.flickr.com/badge_code_v2.gne?show_name=1&amp;count=8&amp;display=random&amp;size=s&amp;layout=h&amp;source=user&amp;user=38584744%40N00"></script>
 
 </div>
+-->
 </div><!-- footer -->
 
 </div><!-- container -->

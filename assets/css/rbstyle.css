@@ -5,6 +5,7 @@ body {
     font-family: "Andale Mono","Courier New", monospace;
     padding: 0;
     background: #ccc url(../img/back_strip.png) repeat-x  top;
+    text-align: left;
 }
 
 /* ----- IDS ----- */
@@ -12,32 +13,42 @@ body {
 #container {
     width: 95%;
     background-color: #FFFFFF;
-    margin: -10px auto 0 auto;
-    padding: 0px 10px 0px 10px;
+    margin: -0 auto 0 auto;
+    padding: 5px 5px 0px 5px;
+    border:1px solid #999;
 }
 
-#mapcontainer {
+#primary-content {
     background-color: #FFFFFF;
     margin: 0 auto 0 auto;
     padding: 0px;
+    position:relative;
+    width:100%;
 }
 
 #footer {
     margin:15px 0 0 0A;
     clear: left;
 }
-#info {
-    width: 33%;
-    float: left;
+#info, #map {
+    
+        border: 1px solid #999;
 }
-#myMap {
+
+#info {
+    width: 220px;
+    background-color:#eee;
+    padding:0 5px 0 5px;
+    margin: 0 0 0 0 ;
+    position:absolute;
+    right:0;
+    top:0;
+}
+#map {
     text-align: center;
     background-color: #000;
-    position: relative;
-    width: 65%;
     height: 500px;
-    border: gray solid 3px;
-    margin: 0 0 0 34%;
+    margin: 0 235px 0 0;
 }
 
 /* ----- CLASSES ----- */
@@ -49,14 +60,21 @@ body {
 
 /* ----- HEADINGS ----- */
 
+h1,h2,h3,h4,h5,h6 {
+    
+    font-family: Georgia, Times, serif;
+}
+
 h1 {
     color: red;
-    font-size: 120%;
+    font-size: 140%;
+    padding:5px 0 5px 0;
 }
 
 h2 {
-    font-size: 110%;
+    font-size: 100%;
     color: blue;
+    padding:3px 0 3px 0;    
 }
 h3 {
     color: #ff9900;
@@ -80,15 +98,17 @@ form {
 table.stats {
     border-collapse: collapse;
     margin: 0 20px 0 20px;
-    width:85%;
+    width:180px;
     font-family:monospace;
-    background-color:#FF9;
+    background-color:#FFD;
 }
 table.stats th {
 
     padding: 3px 3px 3px 3px;
     border: 1px solid #999;
     text-align: right;
+    font-weight:bold;
+    color:#333;
 }
 table.stats td {
     width:50%;
