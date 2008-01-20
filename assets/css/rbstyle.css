@@ -7,7 +7,7 @@ body {
     */
     font-family: Georgia, Times, serif;
     padding: 0;
-    background: #fff url(../img/back_strip6.png) repeat-x  top;
+    background: #fff url(../img/back_strip7.png) repeat-x  top;
     text-align: left;
     color:#333;
 }
@@ -16,15 +16,26 @@ body {
 
 .home #container {
     
-    width:736px;
+    width:738px;
     
 }
 #container {
     width: 95%;
     background-color: #FFFFFF;
     margin: -0 auto 0 auto;
-    padding: 5px 5px 0px 5px;
-    border:1px solid #999;
+    padding: 0px 0px 0px 0px;
+}
+.home #primary-content {
+    margin: 15px 0 0 0;
+    border-top:1px solid #999;
+    
+}
+
+#header {
+    
+    border-left:1px solid black;
+    border-right:1px solid black;
+    height:98px;
 }
 
 #primary-content {
@@ -75,12 +86,12 @@ h1,h2,h3,h4,h5,h6 {
 
 h1 {
 
-    font-size: 140%;
+    font-size: 160%;
     padding:5px 0 5px 0;
 }
 
 h2 {
-    font-size: 100%;
+    font-size: 120%;
     padding:5px 0 5px 0;    
 }
 h3 {

@@ -11,7 +11,11 @@ from tracked.geo.forms import UploadForm, UploadFormTwo
 
 
 def home_page(request):
-    return render_to_response('index.html')
+    
+    
+    home_tracks = Track.objects.all().order_by('-start_time')[:9]
+    
+    return render_to_response('index.html', {'tracks':home_tracks})
 
 def upload(request):
     form = None
