@@ -2,11 +2,16 @@ from django import newforms as forms
 from django.newforms import ModelForm
 from tracked.settings import MEDIA_ROOT
 from tracked.geo.models import GpxFile
+from django.newforms.extras import SelectDateWidget
+
 import os
 
+SELECT_YEARS = (2006,2007,2008,2009)
 
 class DateSearch(forms.Form):
-    pass
+    from_date = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))
+    to_date   = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))
+
 
 class UploadFormTwo(ModelForm):
     class Meta:

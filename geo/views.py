@@ -1,21 +1,28 @@
 # Create your views here.
 from datetime import datetime, timedelta
 import time
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.newforms.extras import SelectDateWidget
 from tracked.geo.helpers import UTC
 from django.template import Template, Context, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
-from tracked.geo.forms import UploadForm, UploadFormTwo
+from tracked.geo.forms import DateSearch
 
 
 def home_page(request):
     
-    
+    # do we have a search?
+    if request.method == 'GET':
+        d = DateSearch(request.GET)
+        if d.is_valid():
+            from_formatted = d.cleaned_data['from_date'].strftime('%Y%m%d')
+            to_formatted = d.cleaned_data['to_date'].strftime('%Y%m%d')
+            return HttpResponseRedirect('/dates/%s-%s'% (from_formatted,to_formatted))
+    else:
+        d = DateSearch()
     home_tracks = Track.objects.all().order_by('-start_time')[:9]
-    
-    return render_to_response('index.html', {'tracks':home_tracks})
+
+    return render_to_response('index.html', {'tracks':home_tracks, 'search_form':d})
 
 def upload(request):
     form = None
@@ -50,6 +57,7 @@ def show_track(request, track_id):
     
     )
 
+
 def dates(request,date_from,date_to):
 
     t = loader.get_template('dates.html')
@@ -61,7 +69,6 @@ def dates(request,date_from,date_to):
 
     c = Context({
         'tracks': tracks,
-        'track': tracks[1]
     })
     return HttpResponse(t.render(c))
     
