@@ -4,6 +4,10 @@ from tracked.settings import MEDIA_ROOT
 from tracked.geo.models import GpxFile
 import os
 
+
+class DateSearch(forms.Form):
+    pass
+
 class UploadFormTwo(ModelForm):
     class Meta:
         model = GpxFile
