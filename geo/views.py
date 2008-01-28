@@ -68,8 +68,12 @@ def dates(request,date_from,date_to):
     tracks = Track.objects.filter(start_time__gte=df, end_time__lte=dt).order_by('start_time')            
     track = tracks[0];
     c = Context({
+        'date_from':df,
+        'date_to':dt,        
+        'track':track,
         'tracks': tracks,
-        'track': track,
+        'waypoints': track.waypoints.order_by('localtime'),
+        
     })
     return HttpResponse(t.render(c))
     

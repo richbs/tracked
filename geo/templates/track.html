@@ -1,34 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% extends "layout.html" %}
 
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-
-<title>
+{% block title %}
 {{track.name}} - {{track.length|floatformat:2}} miles of fun
-</title>
-<!-- Meta Tags -->
-<meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-<meta name="robots" content="index, follow" />
+{% endblock %}
 
-<meta name="description" content="Implementation of Google Maps to mash up with Flickr/GPX XML waypoints and routes." />
-<meta name="keywords" content="UNIX, Mac, Training, GPS, GPX, Map" />
-<meta name="author" content="Richard Barrett-Small" />
+{% block body_class %}map{% endblock %}
 
-<!-- Favicon 
-<link rel="shortcut icon" href="" />
--->
-<!-- CSS -->
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.3.1/build/reset-fonts-grids/reset-fonts-grids.css" />
-<link rel="stylesheet" href="{{MEDIA_URL}}/assets/css/screen.css" type="text/css" />
-
-<!-- JavaScript -->
-
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
+{% block head_tags %}
+ <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
 
 <script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
 <script type="text/javascript" src="/assets/js/jquery.js"></script>
+
 <script type="text/javascript">
 	
 	var d = new Date();
@@ -135,72 +118,36 @@
     //]]>
 
 </script>
+{% endblock %}
 
-</head>
-
-<body class="map">
-
-<div id="container">
-
-<div id="primary-content">
-	<div id="map"></div>
-    <div id="info">
-    <h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
-    <table class="stats">
-        <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
-        <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
-        <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
-        <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
-        <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
-    </table>
-    <h2>Other tracks in file {{gpxfile.name}}</h2>
-    <ul id="tracks">
-    {%for t in gpxfile.track_set.all %}
-    <li>
-    	<!--
-    	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
-    		<img src="/assets/img/XML.png" alt="XML Icon" />
-    	</a>
-    -->
-    <a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}
-        <!--
-        -{{t.end_time|date:"H:i"}}
-            -->
-    </a> [{{t.length|floatformat:2}}M]
-    </li>
-    {%endfor%}
-
-
-    </ul>
-    </div>
-
-<!--
-<a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
+{% block content %}
+<div id="map"></div>
+<div id="info">
+<h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
+<table class="stats">
+    <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
+    <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
+</table>
+<h2>{{gpxfile.name}}</h2>
+<h3>Other tracks from this file</h3>
+<ul id="tracks">
+{%for t in gpxfile.track_set.all %}
+<li>
+	<!--
+	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
+		<img src="/assets/img/XML.png" alt="XML Icon" />
+	</a>
 -->
+<a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}</a>
+    <!--
+    -{{t.end_time|date:"H:i"}}
+        -->
+ [{{t.length|floatformat:2}}M]
+</li>
+{%endfor%}
+</ul>  
+{% endblock %}
 
-
-
-</div><!-- primaryContent -->
-
-
-<div id="footer">
-<!-- Start of Flickr Badge -->
-
-<p>Footer</p>
-<!--
-<div id="imageBanner">
-<script type="text/javascript" src="http://www.flickr.com/badge_code_v2.gne?show_name=1&amp;count=8&amp;display=random&amp;size=s&amp;layout=h&amp;source=user&amp;user=38584744%40N00"></script>
-
-</div>
--->
-</div><!-- footer -->
-
-</div><!-- container -->
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-932633-1";
-urchinTracker();
-</script>
-</body>
-</html>

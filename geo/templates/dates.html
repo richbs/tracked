@@ -1,27 +1,24 @@
 {% extends "layout.html" %}
 
 {% block title %}
-{{track.length}} miles of fun  
+{{track.name}} - {{track.length|floatformat:2}} miles of fun
 {% endblock %}
+
 {% block body_class %}map{% endblock %}
 
 {% block head_tags %}
  <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
 
 <script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
-
-
-<script type="text/javascript" src="/assets/js/mootools.js"></script>
-<script type="text/javascript" src="/assets/js/slimbox.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.js"></script>
 
 <script type="text/javascript">
-	
 	
 	var d = new Date();
     //<![CDATA[
 	var starttime = d.getTime();
 	var report =  'starting:' + d.getTime();
-    function GetMap() {
+    $('#map').ready( function() {
       if (GBrowserIsCompatible()) {
         
 		// Create an array of the Glatlngs for this track's photos
@@ -34,7 +31,7 @@
 		// and for the track route to build polyline
 		
 		var track_latlons = new Array();
-    	{% for wp in track.waypoints.all %}
+    	{% for wp in waypoints %}
        	track_latlons.push( new GLatLng( {{wp.latitude}}, {{wp.longitude}} ) );
         {% endfor %}
 		report += ', tlength:' + track_latlons.length;
@@ -116,12 +113,13 @@
 		map.addOverlay(track_route);        
 		//alert(report);
       }
-    }
+    })
 
     //]]>
 
-    </script>    
+</script>
 {% endblock %}
+
 {% block content %}
 <div id="map"></div>
 <div id="info">
@@ -133,7 +131,8 @@
     <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
     <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
 </table>
-<h2>Other tracks between...</h2>
+<h2>{{date_from|date:"Y/m/d"}}&mdash;{{date_to|date:"Y/m/d"}}</h2>
+<h3>Other tracks from these dates</h3>
 <ul id="tracks">
 {%for t in tracks %}
 <li>
