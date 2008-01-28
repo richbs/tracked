@@ -12,7 +12,7 @@ from tracked.geo.forms import DateSearch
 def home_page(request):
     
     # do we have a search?
-    if request.method == 'GET':
+    if 'from_date_year' in request.GET:
         d = DateSearch(request.GET)
         if d.is_valid():
             from_formatted = d.cleaned_data['from_date'].strftime('%Y%m%d')
@@ -66,9 +66,10 @@ def dates(request,date_from,date_to):
     dt = datetime.strptime(date_to, '%Y%m%d')
     dt = dt + oneday
     tracks = Track.objects.filter(start_time__gte=df, end_time__lte=dt).order_by('start_time')            
-
+    track = tracks[0];
     c = Context({
         'tracks': tracks,
+        'track': track,
     })
     return HttpResponse(t.render(c))
     

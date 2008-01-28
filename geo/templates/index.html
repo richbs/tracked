@@ -1,100 +1,47 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% extends "layout.html" %}
 
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-
-<title>
+{% block title %}
 mytracks.net | GPS Tracks mapped
-</title>
-<!-- Meta Tags -->
-<meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-<meta name="robots" content="index, follow" />
+{% endblock %}
+{% block body_class %}home{% endblock %}
+{% block header %}
+        <img alt="mytracks.net banner image" src="{{MEDIA_URL}}/assets/img/mytracks.jpg"/>            
+{% endblock %}
 
-<meta name="description" content="Implementation of Google Maps to mash up with Flickr/GPX XML waypoints and routes." />
-<meta name="keywords" content="UNIX, Mac, Training, GPS, GPX, Map" />
-<meta name="author" content="Richard Barrett-Small" />
+{% block content %}
+    <h1>mytracks.net | Where have I been?</h1>
+    <p>This site processes the GPX XML file output from a Garmin GPS device and presents the results on Google Maps. It will also plot flickr photos along the routes it finds.</p>
 
-<!-- Favicon 
-<link rel="shortcut icon" href="" />
--->
-<!-- CSS -->
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.3.1/build/reset-fonts-grids/reset-fonts-grids.css" />
-<link rel="stylesheet" href="{{MEDIA_URL}}/assets/css/rbstyle.css" type="text/css" />
-
-<!-- JavaScript -->
-
-<body class="home">
-
-<div id="container">
-    <div id="header">
-        <img src="{{MEDIA_URL}}/assets/img/mytracks.jpg"/>        
-    </div>
-<div id="primary-content">
-	<h1>mytracks.net | Where have I been?</h1>
-	<p>This site processes the GPX XML file output from a Garmin GPS device and presents the results on Google Maps. It will also plot flickr photos along the routes it finds.</p>
-
-	<div>
-	   <div id="track-list">
-	       <h2>Most recent routes</h2> 
-           <ul id="tracks">
-           {%for t in tracks %}
-           <li>
-           	<!--
-           	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
-           		<img src="/assets/img/XML.png" alt="XML Icon" />
-           	</a>
-           -->
-           <a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}</a>
-               <!--
-               -{{t.end_time|date:"H:i"}}
-                   -->
- <span>({{t.name}}) [{{t.length|floatformat:2}}M]</span>
-           </li>
-           {%endfor%}
+    <div>
+       <div id="track-list">
+           <h2>Most recent routes</h2> 
+          <ul id="tracks">
+          {%for t in tracks %}
+          <li>
+              <!--
+              <a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
+                  <img src="/assets/img/XML.png" alt="XML Icon" />
+              </a>
+          -->
+          <a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}</a>
+              <!--
+              -{{t.end_time|date:"H:i"}}
+                  -->
+<span>({{t.name}}) [{{t.length|floatformat:2}}M]</span>
+          </li>
+          {%endfor%}
 
 
-           </ul>
-	   </div>
-	   <div id="search-form">
-	       <form action="" method="get" accept-charset="utf-8">
-	           
-	       {{search_form.as_ul}}
-	           <p><input type="submit" value="Search &rarr;"></p>
-	       </form>
+          </ul>
+       </div>
+       <div id="search-form">
+           <form action="" method="get" accept-charset="utf-8">
+               <ul>
+           {{search_form.as_ul}}
+                </ul>
+           <p><input type="submit" value="Go" /></p>
+           </form>
 
-	   </div>
-	</div>
-</div>
-
-<!--
-<a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
--->
-
-
-
-</div><!-- primaryContent -->
-
-
-<div id="footer">
-<!-- Start of Flickr Badge -->
-
-<p>Footer</p>
-<!--
-<div id="imageBanner">
-<script type="text/javascript" src="http://www.flickr.com/badge_code_v2.gne?show_name=1&amp;count=8&amp;display=random&amp;size=s&amp;layout=h&amp;source=user&amp;user=38584744%40N00"></script>
-
-</div>
--->
-</div><!-- footer -->
-
-</div><!-- container -->
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-932633-1";
-urchinTracker();
-</script>
-</body>
-</html>
+       </div>
+    </div>    
+{% endblock %}

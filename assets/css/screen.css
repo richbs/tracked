@@ -14,21 +14,12 @@ body {
 
 /* ----- IDS ----- */
 
-.home #container {
-    
-    width:738px;
-    
-}
+
 #container {
     width: 95%;
     background-color: #FFFFFF;
     margin: -0 auto 0 auto;
     padding: 0px 0px 0px 0px;
-}
-.home #primary-content {
-    margin: 15px 0 0 0;
-    border-top:1px solid #999;
-    
 }
 
 #header {
@@ -50,7 +41,8 @@ body {
     margin:15px 0 0 0A;
     clear: left;
 }
-#info, #map {
+#info,
+#map {
     
         border: 1px solid #999;
 }
@@ -68,6 +60,28 @@ body {
     background-color: #000;
     height: 500px;
     margin: 0 235px 0 0;
+}
+/* -- HOMEPAGE STYLES -- */
+.home #container {
+    
+    width:738px;
+    
+}
+.home #primary-content {
+    margin: 15px 0 0 0;
+    border-top:1px solid #999;
+    
+}
+#track-list {
+    border-right: 1px solid #999;
+    width:350px;
+    float:left;
+    padding:0 5px 0 0;
+}
+#search-form {
+    width:350px;
+    margin-left:355px;
+
 }
 
 /* ----- CLASSES ----- */

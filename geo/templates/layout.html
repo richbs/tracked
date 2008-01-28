@@ -6,7 +6,7 @@
 <head>
 
 <title>
-{{track.name}} - {{track.length|floatformat:2}} miles of fun
+{% block title %}mytracks.net{% endblock %}
 </title>
 <!-- Meta Tags -->
 <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
@@ -21,178 +21,26 @@
 -->
 <!-- CSS -->
 <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.3.1/build/reset-fonts-grids/reset-fonts-grids.css" />
-<link rel="stylesheet" href="{{MEDIA_URL}}/assets/css/rbstyle.css" type="text/css" />
+<link rel="stylesheet" href="{{MEDIA_URL}}/assets/css/screen.css" type="text/css" />
 
 <!-- JavaScript -->
 
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
-
-<script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.js"></script>
-<script type="text/javascript">
-	
-	var d = new Date();
-    //<![CDATA[
-	var starttime = d.getTime();
-	var report =  'starting:' + d.getTime();
-    $('#map').ready( function() {
-      if (GBrowserIsCompatible()) {
-        
-		// Create an array of the Glatlngs for this track's photos
-		var photo_latlons = new Array();
-		var photo_urls	= new Array();
-		
-		// @todo add geophotos.url to an array
-				//var d = new Date();
-		// alert('photos done' + (d.getTime() - starttime );
-		// and for the track route to build polyline
-		
-		var track_latlons = new Array();
-    	{% for wp in waypoints %}
-       	track_latlons.push( new GLatLng( {{wp.latitude}}, {{wp.longitude}} ) );
-        {% endfor %}
-		report += ', tlength:' + track_latlons.length;
-		
-		
-		var d = new Date();
-		report += ', track done:' + (d.getTime() - starttime );
-        
-		//map.setCenter(new GLatLng(56.776,-3.932), 13);
-		function launchLightbox(e) {
-			Lightbox.show(e.href, e.title);
-			return false;
-		}
-        // Creates a marker at the given point with the given number label
-        function createMarker(point, img_url, img_large, img_name) {
-          var marker = new GMarker(point);
-          GEvent.addListener(marker, "click", function() {
-			var divvy = document.createElement('div');
-		
-			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><br /><span class=\"instruction\">Activate Lightbox</span></a></p>";
-			photo_link =  divvy.getElementsByTagName('a')[0];
-			photo_link.onclick = function(){launchLightbox(this); return false;};
-			// make the a listen for lightbox
-            marker.openInfoWindow(divvy);
-          });
-          return marker;
-        }
-
-        //create bounds object to set zoom level to fit all datapoints
-        var bounds = new GLatLngBounds();
-
-
-		// Loop through photo co-ords to set map bounds
-
-		for (i = 0; i < track_latlons.length; i++ ) {
-				bounds.extend(track_latlons[i]);			
-		}
-		/*	
-		for (i = 0; i < photo_latlons.length; i++ ) {
-				bounds.extend(photo_latlons[i]);			
-		}
-				*/
-		var d = new Date();
-		report += ', bounds done:' + (d.getTime() - starttime );
-
-		// Create polyline from waypoints 
-		//var track_route = new GPolyline(track_latlons, "#0000FF", 2, 1);
-		
-		// Prepare for encoding!
-		
-		var polylineEncoder = new PolylineEncoder(9,4,0.00001,true);
-		var track_route = polylineEncoder.dpEncodeToGPolyline(track_latlons);
-		
-		
-		var d = new Date();
-		report += ', track done:' + (d.getTime() - starttime );
-		var map = new GMap2(document.getElementById("map"),  {mapTypes:[G_HYBRID_MAP]} );
-
-        map.addControl(new GLargeMapControl());
-        map.addControl(new GMapTypeControl());
-		map.addControl(new GScaleControl());
-		//map.enableScrollWheelZoom();
-		//map.addControl(new GOverviewMapControl());
-        map.setCenter(bounds.getCenter());
-		map.setZoom(map.getBoundsZoomLevel(bounds));
-		//map.setMapType(G_HYBRID_MAP);
-		
-		var d = new Date();
-		report += ', map done:' + (d.getTime() - starttime );
-		// Loop through adding photo markers to map
-		
-		for (i = 0; i < photo_latlons.length; i++ ) {
-        	map.addOverlay(createMarker(photo_latlons[i], photo_urls[i].square, photo_urls[i].medium, photo_urls[i].title));
-		}
-		var d = new Date();
-		report += ', photo adding done:' + (d.getTime() - starttime );
-		
-		
-		map.addOverlay(track_route);        
-		//alert(report);
-      }
-    })
-
-    //]]>
-
-</script>
-
+<script type="text/javascript" src="{{MEDIA_URL}}/assets/js/jquery.js"></script>
+{% block head_tags %}{% endblock %}
 </head>
 
-<body class="map">
+<body class="{% block body_class %}{% endblock %}">
 
 <div id="container">
+<div id="header">{% block header %}{% endblock %}</div>
 
 <div id="primary-content">
-	<div id="map"></div>
-    <div id="info">
-    <h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
-    <table class="stats">
-        <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
-        <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
-        <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
-        <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
-        <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
-    </table>
-    <h2>Other tracks in file {{gpxfile.name}}</h2>
-    <ul id="tracks">
-    {%for t in gpxfile.track_set.all %}
-    <li>
-    	<!--
-    	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
-    		<img src="/assets/img/XML.png" alt="XML Icon" />
-    	</a>
-    -->
-    <a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}
-        <!--
-        -{{t.end_time|date:"H:i"}}
-            -->
-    </a> [{{t.length|floatformat:2}}M]
-    </li>
-    {%endfor%}
-
-
-    </ul>
-    </div>
-
-<!--
-<a class="thumb-img" rel="lightbox" href="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a.jpg"><img src="http://farm2.static.flickr.com/1040/1173815850_24f1bcdf5a_s.jpg" alt="Photo taken at this location."/></a>
--->
-
-
-
+{% block content %}{% endblock %}
 </div><!-- primaryContent -->
 
 
 <div id="footer">
-<!-- Start of Flickr Badge -->
-
-<p>Footer</p>
-<!--
-<div id="imageBanner">
-<script type="text/javascript" src="http://www.flickr.com/badge_code_v2.gne?show_name=1&amp;count=8&amp;display=random&amp;size=s&amp;layout=h&amp;source=user&amp;user=38584744%40N00"></script>
-
-</div>
--->
+{% block footer %}{% endblock %}
 </div><!-- footer -->
 
 </div><!-- container -->
