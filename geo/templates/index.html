@@ -41,7 +41,9 @@ mytracks.net | GPS Tracks mapped
                 </ul>
            <p><input type="submit" value="Go" /></p>
            </form>
-
+           {%if message%}
+			<p>{{message}}</p>
+			{% endif %}
        </div>
     </div>    
 {% endblock %}

@@ -8,21 +8,30 @@ from django.template import Template, Context, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
 from tracked.geo.forms import DateSearch
 
+ONE_DAY = timedelta(days=1)
 
 def home_page(request):
+    
+    message = None
     
     # do we have a search?
     if 'from_date_year' in request.GET:
         d = DateSearch(request.GET)
         if d.is_valid():
-            from_formatted = d.cleaned_data['from_date'].strftime('%Y%m%d')
-            to_formatted = d.cleaned_data['to_date'].strftime('%Y%m%d')
-            return HttpResponseRedirect('/dates/%s-%s'% (from_formatted,to_formatted))
+            df = d.cleaned_data['from_date']
+            dt = d.cleaned_data['to_date']
+            tracks = Track.objects.filter(start_time__gte=df, end_time__lte=dt).order_by('start_time')
+            if len(tracks) > 0:
+                from_formatted = d.cleaned_data['from_date'].strftime('%Y%m%d')
+                to_formatted = d.cleaned_data['to_date'].strftime('%Y%m%d')
+                return HttpResponseRedirect('/dates/%s-%s'% (from_formatted,to_formatted))
+            else:
+                message = "No tracks recorded in this time frame"
     else:
         d = DateSearch()
     home_tracks = Track.objects.all().order_by('-start_time')[:9]
 
-    return render_to_response('index.html', {'tracks':home_tracks, 'search_form':d})
+    return render_to_response('index.html', {'tracks':home_tracks, 'search_form':d, 'message':message})
 
 def upload(request):
     form = None
@@ -62,10 +71,9 @@ def dates(request,date_from,date_to):
 
     t = loader.get_template('dates.html')
     df = datetime.strptime(date_from, '%Y%m%d')
-    oneday = timedelta(days=1)
     dt = datetime.strptime(date_to, '%Y%m%d')
-    dt = dt + oneday
-    tracks = Track.objects.filter(start_time__gte=df, end_time__lte=dt).order_by('start_time')            
+    dt = dt + ONE_DAY
+    tracks = Track.objects.filter(start_time__gte=df, end_time__lte=dt).order_by('start_time')
     track = tracks[0];
     c = Context({
         'date_from':df,

@@ -107,17 +107,21 @@ h1,h2,h3,h4,h5,h6 {
 h1 {
 
     font-size: 145%;
-    padding:5px 0 5px 0;
+    padding:0px 0 0px 0;
+    margin:5px 0 5px 5px;
 }
 
 h2 {
     font-size: 130%;
-    padding:10px 0 5px 0;    
+    padding:0px 0 0px 0;
+    margin:5px 0 5px 5px;    
 }
 h3 {
-    color: #ff9900;
+    color: #666;
     font-size: 110%;    
     line-height:120%;
+    padding:0px 0 0px 0;
+    margin:0px 0 5px 10px;    
 }
 
 p {
