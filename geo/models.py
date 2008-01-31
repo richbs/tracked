@@ -217,16 +217,46 @@ class Track(models.Model):
     waypoints   = models.ManyToManyField(WayPoint,editable=False)
     gpx_file = models.ForeignKey(GpxFile,edit_inline=models.TABULAR,core=True,num_extra_on_change=1,num_in_admin=1)
     
+    def geotag_photo(self, xml_photo):
+        
+        photo_dt = datetime.strptime(xml_photo['datetaken'], '%Y-%m-%d %H:%M:%S')
+        prev_wp = None
+        found = False
+        for w in self.waypoints.all():
+            
+            if prev_wp:
+                
+                if prev_wp.localtime < photo_dt and w.localtime > photo_dt:
+                    td = w.localtime - prev_wp.localtime
+                    total_difference = td.seconds
+                    td = photo_dt - prev_wp.localtime
+                    photo_difference = td.seconds
+                    dfactor = photo_difference / float(total_difference)
+                    photo_lat = float(prev_wp.latitude) + ((float(w.latitude) - float(prev_wp.latitude)) * dfactor)
+                    photo_lon = float(prev_wp.longitude) + ((float(w.longitude) - float(prev_wp.longitude)) * dfactor)
+                    geophoto = {}
+                    geophoto['xml'] = xml_photo
+                    geophoto['latitude'] = photo_lat
+                    geophoto['longitude'] = photo_lon
+                    return geophoto
+            
+            prev_wp = w
+        
+        return False
+    
     def get_photos(self, flickr_user="38584744@N00"):
         
         flickr = flickrapi.FlickrAPI(FLICKR_KEY)
         result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time, min_taken_date=self.start_time,extras='date_taken')
-        return [
-                        result.xml,
-        result.photos[0].photo[0]['datetaken'],
-
-                self.end_time,
-                self.start_time ]
+        # assert False, result.xml
+        geophotos = []
+        for ph in result.photos[0].photo:
+            gp = self.geotag_photo(ph)
+            if gp:
+                geophotos.append(gp)
+        return geophotos
+            
+    
                 
     def update_data(self):
         

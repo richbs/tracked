@@ -57,14 +57,11 @@ def upload(request):
         return render_to_response('upload.html', {'form':form})
     
 def show_track(request, track_id):
-    track   = Track.objects.get(id=track_id)
-    # track.get_photos()
-    
+    track = Track.objects.get(id=track_id)
+    geophotos = track.get_photos()
     gpxfile = track.gpx_file
     wps = track.waypoints.order_by('localtime')
-    return render_to_response('track.html', {'track':track, 'gpxfile':gpxfile, 'waypoints':wps}
-    
-    )
+    return render_to_response('track.html', {'track':track, 'gpxfile':gpxfile, 'waypoints':wps, 'geophotos':geophotos })
 
 
 def dates(request,date_from,date_to):

@@ -101,11 +101,13 @@
 		
 		var d = new Date();
 		report += ', map done:' + (d.getTime() - starttime );
-		// Loop through adding photo markers to map
+		// Loop through adding photo markers to map fish
+		{% for gp in geophotos %}
+			//fish
+        	map.addOverlay(createMarker( new GLatLng( {{gp.latitude}}, {{gp.longitude}} ) , 'http://farm{{gp.xml.farm}}.static.flickr.com/{{gp.xml.server}}/{{gp.xml.id}}_{{gp.xml.secret}}_s_d.jpg', 'med', {{gp.xml.id}}));
+		{% endfor %}
 		
-		for (i = 0; i < photo_latlons.length; i++ ) {
-        	map.addOverlay(createMarker(photo_latlons[i], photo_urls[i].square, photo_urls[i].medium, photo_urls[i].title));
-		}
+
 		var d = new Date();
 		report += ', photo adding done:' + (d.getTime() - starttime );
 		
