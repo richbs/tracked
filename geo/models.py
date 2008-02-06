@@ -11,30 +11,44 @@ import flickrapi
 gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
 gpx_file_name = FilenameMatchesRegularExpression('^[^ ]{3,80}\.gpx$', 'Filename must end in GPX')
 
-
-# Create your models here.
 class WayPoint(models.Model):
-    """(WayPoint description)"""
+    """
+    
+    """
     latitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
     longitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
     altitude = models.DecimalField(max_digits=12, decimal_places=7, db_index=True)
     localtime = models.DateTimeField(db_index=True)
     gmtime = models.DateTimeField(db_index=True)
+
     class Admin:
         pass
 
     def __unicode__(self):
         return "%s %sm" % (  self.gmtime.strftime('%Y-%m-%d %H:%M:%S'), str(self.altitude) )
 
-class GpxFile(models.Model):
 
+class FlickrPhoto(models.Model):
+    """Details of a photo on Flickr"""
+    photo_id = models.IntegerField(max_length=10)
+    title = models.CharField(max_length=256)
+    description = models.CharField(max_length=2000)
+    secret = models.CharField(max_length=10)
+    farm = models.IntegerField(max_length=1)
+    server = models.IntegerField(max_length=3)
+    location = models.ForeignKey(WayPoint)    
+    class Admin:
+        pass
+        
+class GpxFile(models.Model):
+    """Details of the uploaded XML file
+
+    Linked to some waypoints and some tracks
+    
+    """
     def __unicode__(self):
         return "%s %s" % ( self.name, self.filename )
 
-    """
-    The record of the XML file uploaded.
-    Linked to some waypoints
-    """
     class Admin:
         """docstring for Admin"""
         fields = (
@@ -203,8 +217,6 @@ class Track(models.Model):
     def __unicode__(self):
         return "%s %s-%s" % (self.name, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), self.end_time.strftime('%H:%M:%S') )
 
-
-
     name        = models.CharField( max_length=100,db_index=True, core=True)
     description = models.CharField(blank=True, max_length=255)
     start_time  = models.DateTimeField(db_index=True)
@@ -221,19 +233,33 @@ class Track(models.Model):
         
         photo_dt = datetime.strptime(xml_photo['datetaken'], '%Y-%m-%d %H:%M:%S')
         prev_wp = None
+        prev_photo = None
         found = False
         for w in self.waypoints.all():
-            
+            # Do we have a waypoint to compare with?
             if prev_wp:
-                
+                # If this photo is taken between the two waypoints in the loop
                 if prev_wp.localtime < photo_dt and w.localtime > photo_dt:
+                
+                    
+                    # get the timedelata between the waypoints
                     td = w.localtime - prev_wp.localtime
                     total_difference = td.seconds
+                    
+                    # calculate the timedelta between the first waypoint and the phot being taken
                     td = photo_dt - prev_wp.localtime
                     photo_difference = td.seconds
+                    
+                    # create a factor that plots the point between the two waypoint timings the photo was taken
                     dfactor = photo_difference / float(total_difference)
+                    
+                    # multiply the difference between the lat/lon/alt of the waypoins by this factor
                     photo_lat = float(prev_wp.latitude) + ((float(w.latitude) - float(prev_wp.latitude)) * dfactor)
                     photo_lon = float(prev_wp.longitude) + ((float(w.longitude) - float(prev_wp.longitude)) * dfactor)
+                    photo_alt = float(prev_wp.altitude) + ((float(w.altitude) - float(prev_wp.altitude)) * dfactor)
+                    # Prepare a waypoint object to store the results of the geotagging calculations
+                    photo_waypoint = WayPoint.objects.get_or_create(latitude=photo_lat,longitude=photo_lat,altitude=photo_alt,gmtime=photo_dt,localtime=photo_dt);
+                    photo_details = FlickrPhoto.objects.get_or_create();
                     geophoto = {}
                     geophoto['xml'] = xml_photo
                     geophoto['latitude'] = photo_lat
@@ -248,12 +274,15 @@ class Track(models.Model):
         
         flickr = flickrapi.FlickrAPI(FLICKR_KEY)
         result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time, min_taken_date=self.start_time,extras='date_taken')
-        # assert False, result.xml
+        # assert False, [dir(result.photos[0]), result.xml, result.photos["total"]   ]
+                            
         geophotos = []
-        for ph in result.photos[0].photo:
-            gp = self.geotag_photo(ph)
-            if gp:
-                geophotos.append(gp)
+        assert False, '' > 0
+        if int(result.photos[0]["total"]) > 0:
+            for ph in result.photos[0].photo:
+                gp = self.geotag_photo(ph)
+                if gp:
+                    geophotos.append(gp)
         return geophotos
             
     
@@ -303,7 +332,7 @@ class Track(models.Model):
         pass
 
 class Trip(models.Model):
-    def __str__(self):
+    def __unicode__(self):
         return "Trip"
         
     """(Trip description)"""

@@ -18,7 +18,16 @@
     //<![CDATA[
 	var starttime = d.getTime();
 	var report =  'starting:' + d.getTime();
+    
+    $(window).resize(function(){
+    
+    	$('#map').height($(this).height() - 5);
+    });
+
     $('#map').ready( function() {
+
+		$('#map').height( $(window).height() - 5 );
+    
       if (GBrowserIsCompatible()) {
         
 		// Create an array of the Glatlngs for this track's photos
