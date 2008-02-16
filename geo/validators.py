@@ -1,5 +1,5 @@
 import re, django
-from django.utils.translation import ugettext as _, ugettext_lazy, ungettext
+from django.utils.translation import ugettext_lazy, ungettext
 from django.utils.functional import Promise, lazy
 from django.utils.encoding import force_unicode
 from django.core.validators import ValidationError
