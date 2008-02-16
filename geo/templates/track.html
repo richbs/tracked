@@ -7,12 +7,38 @@
 {% block body_class %}map{% endblock %}
 
 {% block head_tags %}
- <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
-
+<link rel="stylesheet" type="text/css" href="/assets/css/jquery.lightbox.css" media="screen" />
+ 
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
 <script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
 <script type="text/javascript" src="/assets/js/jquery.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.lightbox.js"></script>
 
 <script type="text/javascript">
+
+        // Creates a marker at the given point with the given number label
+        function createMarker(point, img_url, img_large, img_name) {
+          var marker = new GMarker(point);
+          GEvent.addListener(marker, "click", function() {
+			var divvy = document.createElement('div');
+		
+			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><br /><span class=\"instruction\">Activate Lightbox</span></a></p>";
+			$(divvy).find('a.thumb-img').lightBox({
+
+				overlayOpacity: 0.9,
+				imageLoading: '/assets/img/loading.gif',
+				imageBtnClose: '/assets/img/lightbox-btn-close.gif',
+				imageBtnPrev: '/assets/img/lightbox-btn-prev.gif',
+				imageBtnNext: '/assets/img/lightbox-btn-next.gif',
+				imageBlank:'/assets/img/lightbox-blank.gif',
+				containerResizeSpeed: 350,
+				containerBorderSize: 20
+   			});
+            marker.openInfoWindow(divvy);
+          });
+          return marker;
+        }
+	
 	
 	var d = new Date();
     //<![CDATA[
@@ -25,7 +51,14 @@
     });
 
     $('#map').ready( function() {
-
+    
+    	/* Bind event 
+    	$('#map').click(function(e){
+    		alert(e.target);
+    	});
+    	*/	
+		var d = new Date();
+		report += 'domready:' + (d.getTime() - starttime );	
 		$('#map').height( $(window).height() - 5 );
     
       if (GBrowserIsCompatible()) {
@@ -34,95 +67,72 @@
 		var photo_latlons = new Array();
 		var photo_urls	= new Array();
 		
-		// @todo add geophotos.url to an array
-				//var d = new Date();
-		// alert('photos done' + (d.getTime() - starttime );
 		// and for the track route to build polyline
-		
 		var track_latlons = new Array();
-    	{% for wp in waypoints %}
-       	track_latlons.push( new GLatLng( {{wp.latitude}}, {{wp.longitude}} ) );
+		var track_photos = new Array();
+		var d = new Date();
+		report += ', embarking on track:' + (d.getTime() - starttime );
+		
+    	{% for wp in track.waypoints_ordered %}
+	       	{% if wp.photo_id %}
+				p_marker = createMarker( new GLatLng( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) ,
+        			'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}_s_d.jpg',
+        			'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}.jpg',
+        			'{{wp.photo_title}} at {{wp.altitude|floatformat:2}}m');	       		
+	       		track_photos.push(p_marker );
+	       	{% else %}
+	       		track_latlons.push( new GLatLng( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) );
+	       	{% endif %}
         {% endfor %}
+        
 		report += ', tlength:' + track_latlons.length;
-		
-		
 		var d = new Date();
 		report += ', track done:' + (d.getTime() - starttime );
         
 		//map.setCenter(new GLatLng(56.776,-3.932), 13);
-		function launchLightbox(e) {
-			Lightbox.show(e.href, e.title);
-			return false;
-		}
-        // Creates a marker at the given point with the given number label
-        function createMarker(point, img_url, img_large, img_name) {
-          var marker = new GMarker(point);
-          GEvent.addListener(marker, "click", function() {
-			var divvy = document.createElement('div');
-		
-			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><br /><span class=\"instruction\">Activate Lightbox</span></a></p>";
-			photo_link =  divvy.getElementsByTagName('a')[0];
-			photo_link.onclick = function(){launchLightbox(this); return false;};
-			// make the a listen for lightbox
-            marker.openInfoWindow(divvy);
-          });
-          return marker;
-        }
 
         //create bounds object to set zoom level to fit all datapoints
         var bounds = new GLatLngBounds();
 
-
 		// Loop through photo co-ords to set map bounds
-
 		for (i = 0; i < track_latlons.length; i++ ) {
 				bounds.extend(track_latlons[i]);			
 		}
-		/*	
-		for (i = 0; i < photo_latlons.length; i++ ) {
-				bounds.extend(photo_latlons[i]);			
-		}
-				*/
+
 		var d = new Date();
 		report += ', bounds done:' + (d.getTime() - starttime );
 
 		// Create polyline from waypoints 
 		//var track_route = new GPolyline(track_latlons, "#0000FF", 2, 1);
 		
-		// Prepare for encoding!
-		
+		// Prepare for encoding!		
 		var polylineEncoder = new PolylineEncoder(9,4,0.00001,true);
 		var track_route = polylineEncoder.dpEncodeToGPolyline(track_latlons);
 		
 		
 		var d = new Date();
 		report += ', track done:' + (d.getTime() - starttime );
-		var map = new GMap2(document.getElementById("map"),  {mapTypes:[G_HYBRID_MAP]} );
-
+		;
+		var map = new GMap2( document.getElementById("map"),  {mapTypes:[G_HYBRID_MAP]} );
         map.addControl(new GLargeMapControl());
         map.addControl(new GMapTypeControl());
 		map.addControl(new GScaleControl());
 		//map.enableScrollWheelZoom();
-		//map.addControl(new GOverviewMapControl());
+		map.addControl(new GOverviewMapControl());
         map.setCenter(bounds.getCenter());
 		map.setZoom(map.getBoundsZoomLevel(bounds));
 		//map.setMapType(G_HYBRID_MAP);
 		
 		var d = new Date();
 		report += ', map done:' + (d.getTime() - starttime );
-		// Loop through adding photo markers to map fish
-		{% for gp in geophotos %}
-			//fish
-        	map.addOverlay(createMarker( new GLatLng( {{gp.latitude}}, {{gp.longitude}} ) , 'http://farm{{gp.xml.farm}}.static.flickr.com/{{gp.xml.server}}/{{gp.xml.id}}_{{gp.xml.secret}}_s_d.jpg', 'med', {{gp.xml.id}}));
-		{% endfor %}
 		
-
 		var d = new Date();
 		report += ', photo adding done:' + (d.getTime() - starttime );
 		
-		
-		map.addOverlay(track_route);        
-		//alert(report);
+		map.addOverlay(track_route);
+		for (i in track_photos){
+			map.addOverlay(track_photos[i]);
+		}
       }
     })
 
@@ -142,10 +152,10 @@
     <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
     <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
 </table>
-<h2>{{gpxfile.name}}</h2>
+<h2>{{track.gpx_file.name}}</h2>
 <h3>Other tracks from this file</h3>
 <ul id="tracks">
-{%for t in gpxfile.track_set.all %}
+{%for t in track.gpx_file.track_set.all %}
 <li>
 	<!--
 	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">

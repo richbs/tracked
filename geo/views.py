@@ -7,6 +7,7 @@ from tracked.geo.helpers import UTC
 from django.template import Template, Context, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
 from tracked.geo.forms import DateSearch
+from django.db import connection
 
 ONE_DAY = timedelta(days=1)
 
@@ -31,7 +32,7 @@ def home_page(request):
         d = DateSearch()
     home_tracks = Track.objects.all().order_by('-start_time')[:9]
 
-    return render_to_response('index.html', {'tracks':home_tracks, 'search_form':d, 'message':message})
+    return render_to_response('index.html', {'tracks':home_tracks, 'search_form':d, 'message':message,'qs': connection.queries})
 
 def upload(request):
     form = None
@@ -57,11 +58,10 @@ def upload(request):
         return render_to_response('upload.html', {'form':form})
     
 def show_track(request, track_id):
-    track = Track.objects.get(id=track_id)
-    geophotos = track.get_photos()
-    gpxfile = track.gpx_file
-    wps = track.waypoints.order_by('localtime')
-    return render_to_response('track.html', {'track':track, 'gpxfile':gpxfile, 'waypoints':wps, 'geophotos':geophotos })
+    track = Track.objects.select_related().get(id=track_id)
+    #geophotos = track.get_photos()
+    #gpxfile = track.gpx_file
+    return render_to_response('track.html', {'track':track, 'qs':connection.queries})
 
 
 def dates(request,date_from,date_to):

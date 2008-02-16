@@ -10,35 +10,32 @@ import flickrapi
 
 gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
 gpx_file_name = FilenameMatchesRegularExpression('^[^ ]{3,80}\.gpx$', 'Filename must end in GPX')
-
-class WayPoint(models.Model):
-    """
     
+class WayPoint(models.Model):
+    """A point in space and time
+    
+    Need to normalise Flickr info when QuerySet refactor is merged into trunk
+    So select related will be more accessible
     """
     latitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
     longitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
     altitude = models.DecimalField(max_digits=12, decimal_places=7, db_index=True)
     localtime = models.DateTimeField(db_index=True)
     gmtime = models.DateTimeField(db_index=True)
-
+    
+    # Need to normalise this into flickrphoto model after queryset refactor
+    photo_id = models.IntegerField(max_length=10,null=True)
+    photo_title = models.CharField(max_length=256,null=True)
+    photo_description = models.CharField(max_length=2000,null=True)
+    photo_secret = models.CharField(max_length=10,null=True)
+    photo_farm = models.IntegerField(max_length=1,null=True)
+    photo_server = models.IntegerField(max_length=3,null=True)
+    
     class Admin:
         pass
 
     def __unicode__(self):
         return "%s %sm" % (  self.gmtime.strftime('%Y-%m-%d %H:%M:%S'), str(self.altitude) )
-
-
-class FlickrPhoto(models.Model):
-    """Details of a photo on Flickr"""
-    photo_id = models.IntegerField(max_length=10)
-    title = models.CharField(max_length=256)
-    description = models.CharField(max_length=2000)
-    secret = models.CharField(max_length=10)
-    farm = models.IntegerField(max_length=1)
-    server = models.IntegerField(max_length=3)
-    location = models.ForeignKey(WayPoint)    
-    class Admin:
-        pass
         
 class GpxFile(models.Model):
     """Details of the uploaded XML file
@@ -229,6 +226,9 @@ class Track(models.Model):
     waypoints   = models.ManyToManyField(WayPoint,editable=False)
     gpx_file = models.ForeignKey(GpxFile,edit_inline=models.TABULAR,core=True,num_extra_on_change=1,num_in_admin=1)
     
+    def waypoints_ordered(self):
+        return self.waypoints.select_related().order_by('localtime')
+    
     def geotag_photo(self, xml_photo):
         
         photo_dt = datetime.strptime(xml_photo['datetaken'], '%Y-%m-%d %H:%M:%S')
@@ -237,6 +237,7 @@ class Track(models.Model):
         found = False
         for w in self.waypoints.all():
             # Do we have a waypoint to compare with?
+            
             if prev_wp:
                 # If this photo is taken between the two waypoints in the loop
                 if prev_wp.localtime < photo_dt and w.localtime > photo_dt:
@@ -257,14 +258,24 @@ class Track(models.Model):
                     photo_lat = float(prev_wp.latitude) + ((float(w.latitude) - float(prev_wp.latitude)) * dfactor)
                     photo_lon = float(prev_wp.longitude) + ((float(w.longitude) - float(prev_wp.longitude)) * dfactor)
                     photo_alt = float(prev_wp.altitude) + ((float(w.altitude) - float(prev_wp.altitude)) * dfactor)
+                    
                     # Prepare a waypoint object to store the results of the geotagging calculations
-                    photo_waypoint = WayPoint.objects.get_or_create(latitude=photo_lat,longitude=photo_lat,altitude=photo_alt,gmtime=photo_dt,localtime=photo_dt);
-                    photo_details = FlickrPhoto.objects.get_or_create();
-                    geophoto = {}
-                    geophoto['xml'] = xml_photo
-                    geophoto['latitude'] = photo_lat
-                    geophoto['longitude'] = photo_lon
-                    return geophoto
+                    photo_waypoint, created = WayPoint.objects.get_or_create(
+                        latitude=photo_lat,
+                        longitude=photo_lon,
+                        altitude=photo_alt,
+                        gmtime=photo_dt,
+                        localtime=photo_dt,
+                        photo_id=xml_photo['id'],
+                        photo_title=xml_photo['title'],
+                        photo_description='',
+                        photo_secret=xml_photo['secret'],
+                        photo_farm=xml_photo['farm'],
+                        photo_server=xml_photo['server']
+                    );
+                    photo_waypoint.save()
+
+                    return photo_waypoint
             
             prev_wp = w
         
@@ -274,15 +285,16 @@ class Track(models.Model):
         
         flickr = flickrapi.FlickrAPI(FLICKR_KEY)
         result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time, min_taken_date=self.start_time,extras='date_taken')
-        # assert False, [dir(result.photos[0]), result.xml, result.photos["total"]   ]
                             
         geophotos = []
-        assert False, '' > 0
+
         if int(result.photos[0]["total"]) > 0:
             for ph in result.photos[0].photo:
                 gp = self.geotag_photo(ph)
                 if gp:
                     geophotos.append(gp)
+                    self.waypoints.add(gp)
+                    
         return geophotos
             
     
@@ -327,6 +339,7 @@ class Track(models.Model):
         self.altitude_min = round(altitude_min,5)
         self.end_time  = previous.localtime
         self.save()
+        self.get_photos()
     
     class Admin:
         pass
