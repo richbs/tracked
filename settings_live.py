@@ -9,3 +9,4 @@ TEMPLATE_DIRS = (
     
 )
 MEDIA_ROOT = '/home/offspinner/webapps/mytracks/tracked'
+
