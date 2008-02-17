@@ -10,7 +10,9 @@
 <link rel="stylesheet" type="text/css" href="/assets/css/jquery.lightbox.css" media="screen" />
  
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{GOOGLE_MAPS_KEY}}" type="text/javascript"></script>
+<!-- 
 <script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
+ -->
 <script type="text/javascript" src="/assets/js/jquery.js"></script>
 <script type="text/javascript" src="/assets/js/jquery.lightbox.js"></script>
 
@@ -22,7 +24,7 @@
           GEvent.addListener(marker, "click", function() {
 			var divvy = document.createElement('div');
 		
-			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><span class=\"instruction\">&raquo;LIGHTBOX</span></a></p>";
+			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" width\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><span class=\"instruction\">&raquo;LIGHTBOX</span></a></p>";
 			$(divvy).find('a.thumb-img').lightBox({
 				overlayOpacity: 0.8,
 				imageLoading: '/assets/img/loading.gif',
@@ -100,11 +102,11 @@
 		report += ', bounds done:' + (d.getTime() - starttime );
 
 		// Create polyline from waypoints 
-		//var track_route = new GPolyline(track_latlons, "#0000FF", 2, 1);
+		var track_route = new GPolyline(track_latlons, "#0000FF", 2, 1);
 		
 		// Prepare for encoding!		
-		var polylineEncoder = new PolylineEncoder(9,4,0.00001,true);
-		var track_route = polylineEncoder.dpEncodeToGPolyline(track_latlons);
+		// var polylineEncoder = new PolylineEncoder(9,4,0.00001,true);
+		// var track_route = polylineEncoder.dpEncodeToGPolyline(track_latlons);
 		
 		
 		var d = new Date();
