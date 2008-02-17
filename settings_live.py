@@ -8,5 +8,5 @@ TEMPLATE_DIRS = (
     '/home/offspinner/webapps/mytracks/tracked/geo/templates',
     
 )
-MEDIA_ROOT = '/home/offspinner/webapps/mytracks/tracked'
+MEDIA_ROOT = '/home/offspinner/webapps/mytracks/tracked/media'
 
