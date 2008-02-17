@@ -7,6 +7,7 @@ from tracked.geo.helpers import UTC
 from django.template import Template, Context, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
 from tracked.geo.forms import DateSearch
+from tracked.settings import GOOGLE_MAPS_KEY
 from django.db import connection
 
 ONE_DAY = timedelta(days=1)
