@@ -62,7 +62,7 @@ def show_track(request, track_id):
     track = Track.objects.select_related().get(id=track_id)
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
-    return render_to_response('track.html', {'track':track, 'qs':connection.queries})
+    return render_to_response('track.html', {'track':track, 'qs':connection.queries, 'GOOGLE_MAPS_KEY':GOOGLE_MAPS_KEY})
 
 
 def dates(request,date_from,date_to):
