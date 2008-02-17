@@ -1,13 +1,12 @@
 /* ----- CSS ----- */
 
 body {
-    background-color: #fff;
 /*
     font-family: "Andale Mono","Courier New", monospace;
     */
     font-family: Georgia, Times, serif;
     padding: 0;
-    background: #fff url(../img/back_strip7.png) repeat-x  top;
+    background: transparent url(../img/back_strip7.png) repeat-x  top;
     text-align: left;
     color:#333;
 }
@@ -17,7 +16,6 @@ body {
 
 #container {
     width: 99%;
-    background-color: #FFFFFF;
     margin: -0 auto 0 auto;
     padding: 0px 0px 0px 0px;
 }
@@ -48,6 +46,7 @@ body {
 }
 
 #info {
+	background-color: #FFFFFF;
     width: 220px;
     padding:0 5px 0 5px;
     margin: 0 0 0 0 ;
