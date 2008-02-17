@@ -247,39 +247,57 @@ a:active {
 }
 
 a.thumb-img {
-    border: none;
-    font-weight: normal;
+	text-decoration:none;
+	font-family:Verdana, "sans serif";
+	border:2px solid #999;
+	display:block;
+	font-weight:normal;
+	height:115px;
+	margin:auto;
+	cursor:pointer;
+	width:120px;
+	background-color:#000;
+	padding-top:5px;
 }
-
 
 a:link.thumb-img img,
 a:visited.thumb-img img {
-    border: 1px solid #666;
-    padding: 3px;
+    border: 1px solid #FFF;
+    margin: 3px;
+    padding:0px;
+
 }
 
 a:hover.thumb-img img,
 a:focus.thumb-img img,
 a:active.thumb-img img {
-    border: 3px solid #666;
-    padding: 1px;
+    border: 4px solid #FFF;
+    padding:0;
+	margin:0;
 }
 a.thumb-img span {
-    background: url(../images/camera_go.png) no-repeat 98% 0%;
-    margin: 0;
+	display:block;
+    background: url(../img/camera_go.png) no-repeat 98% 0%;
+    margin: -2px auto 0 auto;
     padding: 2px 20px 2px 2px;
-    color: black;
-    font-size: 0.8em;
+    color: #EEE;
+    font-size: 1em;
+    background-color:#000;
+    width:76px;
+ 
 }
 a:link.thumb-img span,
 a:visited.thumb-img span {
-    border-bottom: 1px dotted black;
+    border-bottom: 1px dotted #DDD;
+    
 }
 
 a:hover.thumb-img span,
 a:focus.thumb-img span,
 a:active.thumb-img span {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #FFF;
+    color: #FFF;
+
 }
 
 p.thumb-caption {

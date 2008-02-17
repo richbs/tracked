@@ -22,17 +22,14 @@
           GEvent.addListener(marker, "click", function() {
 			var divvy = document.createElement('div');
 		
-			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><br /><span class=\"instruction\">Activate Lightbox</span></a></p>";
+			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><span class=\"instruction\">&raquo;LIGHTBOX</span></a></p>";
 			$(divvy).find('a.thumb-img').lightBox({
-
-				overlayOpacity: 0.9,
+				overlayOpacity: 0.8,
 				imageLoading: '/assets/img/loading.gif',
 				imageBtnClose: '/assets/img/lightbox-btn-close.gif',
 				imageBtnPrev: '/assets/img/lightbox-btn-prev.gif',
 				imageBtnNext: '/assets/img/lightbox-btn-next.gif',
-				imageBlank:'/assets/img/lightbox-blank.gif',
-				containerResizeSpeed: 350,
-				containerBorderSize: 20
+				imageBlank:'/assets/img/lightbox-blank.gif'
    			});
             marker.openInfoWindow(divvy);
           });
