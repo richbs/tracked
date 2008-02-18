@@ -4,10 +4,9 @@ import time
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from tracked.geo.helpers import UTC
-from django.template import Template, Context, loader
+from django.template import Template, RequestContext, loader
 from tracked.geo.models import WayPoint, Track, GpxFile
 from tracked.geo.forms import DateSearch
-from tracked.settings import GOOGLE_MAPS_KEY
 from django.db import connection
 
 ONE_DAY = timedelta(days=1)
@@ -33,7 +32,7 @@ def home_page(request):
         d = DateSearch()
     home_tracks = Track.objects.all().order_by('-start_time')[:9]
 
-    return render_to_response('index.html', {'tracks':home_tracks, 'search_form':d, 'message':message,'qs': connection.queries})
+    return render_to_response('index.html', {'tracks':home_tracks, 'search_form':d, 'message':message,'qs': connection.queries}, context_instance=RequestContext(request))
 
 def upload(request):
     form = None

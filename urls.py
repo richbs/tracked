@@ -16,5 +16,5 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-             (r'^assets/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/richbs/Sites/tracked/assets/', 'show_indexes': True}),
+             (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/richbs/Sites/tracked/media/', 'show_indexes': True}),
     )
