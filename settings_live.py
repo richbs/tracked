@@ -1,4 +1,4 @@
-from tracked.settings import *
+
 DEBUG = True
 DATABASE_HOST = 'localhost'
 MEDIA_ROOT = '/home/offspinner/webapps/mytracks/tracked/media/'
