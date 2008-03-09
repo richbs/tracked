@@ -69,17 +69,16 @@
 		var track_photos = new Array();
 		var d = new Date();
 		report += ', embarking on track:' + (d.getTime() - starttime );
+		{% for wp in track.random_photos %}
+			p_marker = createMarker( new GLatLng( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) ,
+        		'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}_s_d.jpg',
+        		'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}.jpg',
+        		'{{wp.photo_title}} at {{wp.altitude|floatformat:2}}m');	       		
+	       	track_photos.push(p_marker );		
+		{% endfor %}
 		
-    	{% for wp in track.waypoints_ordered %}
-	       	{% if wp.photo_id %}
-				p_marker = createMarker( new GLatLng( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) ,
-        			'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}_s_d.jpg',
-        			'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}.jpg',
-        			'{{wp.photo_title}} at {{wp.altitude|floatformat:2}}m');	       		
-	       		track_photos.push(p_marker );
-	       	{% else %}
+    	{% for wp in track.gps_points %}
 	       		track_latlons.push( new GLatLng( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) );
-	       	{% endif %}
         {% endfor %}
         
 		report += ', tlength:' + track_latlons.length;

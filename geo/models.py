@@ -147,7 +147,7 @@ class GpxFile(models.Model):
                     length += get_distance(previous,wp)
                     track.waypoints.add(wp)
                     previous = wp
-        # del(waypoints)
+        #del(waypoints)
 
         # Add track if it's long enough
         if length > min_length:
@@ -235,10 +235,19 @@ class Track(models.Model):
     gpx_file = models.ForeignKey(GpxFile,edit_inline=models.TABULAR,core=True,num_extra_on_change=1,num_in_admin=1)
     
     def waypoints_ordered(self):
+        """all waypoints for this track"""
         return self.waypoints.select_related().order_by('localtime')
     
+    def random_photos(self):
+        """10 waypoints from flickr"""
+        return self.waypoints.filter(photo_id__isnull=False).order_by('?')[:10]
+    
+    def gps_points(self):
+        """Waypoints with no photo"""
+        return self.waypoints.filter(photo_id__isnull=True).order_by('localtime')
+    
     def geotag_photo(self, xml_photo):
-        
+        """find the location of this photo using existing waypoints"""
         photo_dt = datetime.strptime(xml_photo['datetaken'], '%Y-%m-%d %H:%M:%S')
         prev_wp = None
         prev_photo = None

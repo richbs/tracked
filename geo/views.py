@@ -61,6 +61,7 @@ def show_track(request, track_id):
     track = Track.objects.select_related().get(id=track_id)
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
+    #assert False, track.random_photos()
     return render_to_response('track.html', {'track':track, 'qs':connection.queries},context_instance=RequestContext(request))
 
 
