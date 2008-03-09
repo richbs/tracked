@@ -5,7 +5,7 @@ import time
 from tracked.geo.helpers import get_distance, UTC
 from tracked.geo.validators import FilenameMatchesRegularExpression, HasAllowableSize
 from tracked.settings import MEDIA_ROOT, FLICKR_KEY
-#from django.core.validators import HasAllowableSize, FilenameMatchesRegularExpression
+
 import flickrapi
 
 gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
@@ -24,12 +24,12 @@ class WayPoint(models.Model):
     gmtime = models.DateTimeField(db_index=True)
     
     # Need to normalise this into flickrphoto model after queryset refactor
-    photo_id = models.IntegerField(max_length=10,null=True)
+    photo_id = models.CharField(max_length=12,null=True)
     photo_title = models.CharField(max_length=256,null=True)
     photo_description = models.CharField(max_length=2000,null=True)
     photo_secret = models.CharField(max_length=10,null=True)
-    photo_farm = models.IntegerField(max_length=1,null=True)
-    photo_server = models.IntegerField(max_length=3,null=True)
+    photo_farm = models.PositiveSmallIntegerField(max_length=1,null=True)
+    photo_server = models.PositiveSmallIntegerField(max_length=3,null=True)
     
     class Admin:
         pass
@@ -147,7 +147,7 @@ class GpxFile(models.Model):
                     length += get_distance(previous,wp)
                     track.waypoints.add(wp)
                     previous = wp
-
+        # del(waypoints)
 
         # Add track if it's long enough
         if length > min_length:
@@ -189,15 +189,23 @@ class GpxFile(models.Model):
 
                     #assert False, timeob2
                     # Try get or create here
-                    try:
+                    try:       
                         w, created = WayPoint.objects.get_or_create(latitude=lat,longitude=lon,altitude=elestring,gmtime=timeob,localtime=localtime)
-                        w.save()
-                        self.waypoints.add(w)                        
+                        #w = WayPoint(latitude=lat,longitude=lon,altitude=elestring,gmtime=timeob,localtime=localtime)
+                        #w.save()
+                        w.gpxfile_set.add(self)
+                        del(w)
+                    #self.waypoints.add(w)                        
                     except ValueError:
                         assert False, node.toxml()
 
+                    #del(created)
                 else:
                     pass # This is not a active log way point
+            del(node)
+            
+        del(gpxlog)
+            
     def save(self):
 
         super(GpxFile, self).save() # Call the "real" save() method
@@ -260,21 +268,23 @@ class Track(models.Model):
                     photo_alt = float(prev_wp.altitude) + ((float(w.altitude) - float(prev_wp.altitude)) * dfactor)
                     
                     # Prepare a waypoint object to store the results of the geotagging calculations
+                    
                     photo_waypoint, created = WayPoint.objects.get_or_create(
-                        latitude=photo_lat,
-                        longitude=photo_lon,
-                        altitude=photo_alt,
-                        gmtime=photo_dt,
-                        localtime=photo_dt,
-                        photo_id=xml_photo['id'],
-                        photo_title=xml_photo['title'],
-                        photo_description='',
-                        photo_secret=xml_photo['secret'],
-                        photo_farm=xml_photo['farm'],
-                        photo_server=xml_photo['server']
-                    );
+                            latitude=photo_lat,
+                            longitude=photo_lon,
+                            altitude=photo_alt,
+                            gmtime=photo_dt,
+                            localtime=photo_dt,
+                            photo_id=xml_photo['id'],
+                            photo_title=xml_photo['title'],
+                            photo_description='hmm',
+                            photo_secret=xml_photo['secret'],
+                            photo_farm=xml_photo['farm'],
+                            photo_server=xml_photo['server'],
+                        );
                     photo_waypoint.save()
-
+                    #except:
+                     #   assert False, '.' + xml_photo['id'] + '.'
                     return photo_waypoint
             
             prev_wp = w

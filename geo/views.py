@@ -61,7 +61,7 @@ def show_track(request, track_id):
     track = Track.objects.select_related().get(id=track_id)
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
-    return render_to_response('track.html', {'track':track, 'qs':connection.queries, 'GOOGLE_MAPS_KEY':GOOGLE_MAPS_KEY})
+    return render_to_response('track.html', {'track':track, 'qs':connection.queries},context_instance=RequestContext(request))
 
 
 def dates(request,date_from,date_to):
@@ -71,8 +71,10 @@ def dates(request,date_from,date_to):
     dt = datetime.strptime(date_to, '%Y%m%d')
     dt = dt + ONE_DAY
     tracks = Track.objects.filter(start_time__gte=df, end_time__lte=dt).order_by('start_time')
+    
     track = tracks[0];
-    c = Context({
+    
+    c = RequestContext(request,{
         'date_from':df,
         'date_to':dt,        
         'track':track,

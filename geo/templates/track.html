@@ -7,12 +7,12 @@
 {% block body_class %}map{% endblock %}
 
 {% block head_tags %}
-<link rel="stylesheet" type="text/css" href="/assets/css/jquery.lightbox.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/css/jquery.lightbox.css" media="screen" />
  
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{GOOGLE_MAPS_KEY}}" type="text/javascript"></script>
-<script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.lightbox.js"></script>
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{GMAP_KEY}}" type="text/javascript"></script>
+<script type="text/javascript" charset="utf-8" src="{{MEDIA_URL}}/js/PolylineEncoder.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}/js/jquery.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}/js/jquery.lightbox.js"></script>
 
 <script type="text/javascript">
 
@@ -25,11 +25,11 @@
 			divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" width\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><span class=\"instruction\">&raquo;LIGHTBOX</span></a></p>";
 			$(divvy).find('a.thumb-img').lightBox({
 				overlayOpacity: 0.8,
-				imageLoading: '/assets/img/loading.gif',
-				imageBtnClose: '/assets/img/lightbox-btn-close.gif',
-				imageBtnPrev: '/assets/img/lightbox-btn-prev.gif',
-				imageBtnNext: '/assets/img/lightbox-btn-next.gif',
-				imageBlank:'/assets/img/lightbox-blank.gif'
+				imageLoading: '{{MEDIA_URL}}/img/loading.gif',
+				imageBtnClose: '{{MEDIA_URL}}/img/lightbox-btn-close.gif',
+				imageBtnPrev: '{{MEDIA_URL}}/img/lightbox-btn-prev.gif',
+				imageBtnNext: '{{MEDIA_URL}}/img/lightbox-btn-next.gif',
+				imageBlank:'{{MEDIA_URL}}/img/lightbox-blank.gif'
    			});
             marker.openInfoWindow(divvy);
           });
@@ -156,7 +156,7 @@
 <li>
 	<!--
 	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
+		<img src="{{MEDIA_URL}}/img/XML.png" alt="XML Icon" />
 	</a>
 -->
 <a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}</a>

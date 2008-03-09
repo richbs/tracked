@@ -7,10 +7,10 @@
 {% block body_class %}map{% endblock %}
 
 {% block head_tags %}
- <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAKrfUII3BXNQXmAzz2nqy9BTpH3CbXHjuCVmaTc5MkkU4wO1RRhRzi2p_D1LoATvO6lsrLOTVH4s_ig" type="text/javascript"></script>
+ <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{GMAP_KEY}}" type="text/javascript"></script>
 
-<script type="text/javascript" charset="utf-8" src="/assets/js/PolylineEncoder.js"></script>
-<script type="text/javascript" src="/assets/js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="{{MEDIA_URL}}/js/PolylineEncoder.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}/js/jquery.js"></script>
 
 <script type="text/javascript">
 	
@@ -138,7 +138,7 @@
 <li>
 	<!--
 	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
-		<img src="/assets/img/XML.png" alt="XML Icon" />
+		<img src="{{MEDIA_URL}}/img/XML.png" alt="XML Icon" />
 	</a>
 -->
 <a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}</a>
