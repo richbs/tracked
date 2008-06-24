@@ -235,7 +235,7 @@ class Track(models.Model):
     gpx_file = models.ForeignKey(GpxFile,edit_inline=models.TABULAR,core=True,num_extra_on_change=1,num_in_admin=1)
     
     def waypoints_ordered(self):
-        """all waypoints for this track"""
+        """all waypoints for this track in order by time"""
         return self.waypoints.select_related().order_by('localtime')
     
     def random_photos(self):
