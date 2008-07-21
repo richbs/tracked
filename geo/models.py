@@ -46,13 +46,7 @@ class GpxFile(models.Model):
     def __unicode__(self):
         return "%s %s" % ( self.name, self.filename )
 
-    class Admin:
-        """docstring for Admin"""
-        fields = (
-            (None, {
-                'fields':('name','description','filename')
-            }),
-        )
+
 
     name        = models.CharField( max_length=100)
     description = models.CharField(blank=True, max_length=255)
@@ -115,8 +109,8 @@ class GpxFile(models.Model):
                         track.save()
                         self.track_set.add(track)
                          # maybe pop off waypoint first and last here then write a function for track to update itself                        
-                        track.waypoints.all().order_by('gmtime')[0].delete()
-                        track.waypoints.all().order_by('-gmtime')[0].delete()
+                        #track.waypoints.all().order_by('gmtime')[0].delete()
+                        #track.waypoints.all().order_by('-gmtime')[0].delete()
                         track.update_data()                                     
 
                     else:

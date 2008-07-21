@@ -1,8 +1,8 @@
-from django import newforms as forms
+from django import forms
 from django.newforms import ModelForm
 from tracked.settings import MEDIA_ROOT
 from tracked.geo.models import GpxFile
-from django.newforms.extras import SelectDateWidget
+from django.forms.extras import SelectDateWidget
 
 import os
 
