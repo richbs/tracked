@@ -1,10 +1,4 @@
-{% extends "layout.html" %}
-
-{% block title %}
-{{track.name}} - {{track.length|floatformat:2}} miles of fun
-{% endblock %}
-
-{% block body_class %}map{% endblock %}
+{% extends "map.html" %}
 
 {% block head_tags %}
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/css/jquery.lightbox.css" media="screen" />
@@ -136,35 +130,3 @@
 
 </script>
 {% endblock %}
-
-{% block content %}
-<div id="map"></div>
-<div id="info">
-<h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
-<table class="stats">
-    <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
-    <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
-    <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
-    <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
-    <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
-</table>
-<h2>{{track.gpx_file.name}}</h2>
-<h3>Other tracks from this file</h3>
-<ul id="tracks">
-{%for t in track.gpx_file.track_set.all %}
-<li>
-	<!--
-	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
-		<img src="{{MEDIA_URL}}/img/XML.png" alt="XML Icon" />
-	</a>
--->
-<a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}</a>
-    <!--
-    -{{t.end_time|date:"H:i"}}
-        -->
- [{{t.length|floatformat:2}}M]
-</li>
-{%endfor%}
-</ul>  
-{% endblock %}
-

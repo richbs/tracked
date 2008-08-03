@@ -353,13 +353,13 @@ class Track(models.Model):
                 length += get_distance(previous,wp)
                 # make this waypoint the previous one
                 previous = wp
-                
+        print  'um'
         # Create track here
-        self.length    = round(length,5)
-        self.ascent    = round(ascent,5)
-        self.descent   = round(descent,5)
-        self.altitude_max = round(altitude_max,5)
-        self.altitude_min = round(altitude_min,5)
+        self.length    = str(round(length,5))
+        self.ascent    = str(round(ascent,5))
+        self.descent   = str(round(descent,5))
+        self.altitude_max = str(round(altitude_max,5))
+        self.altitude_min = str(round(altitude_min,5))
         self.end_time  = previous.localtime
         self.save()
         self.get_photos()

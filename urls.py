@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     (r'^dates/(?P<date_from>\d{8})-(?P<date_to>\d{8})/?', 'tracked.geo.views.dates'),
     # (r'^upload/?', 'tracked.geo.views.upload'),
     (r'^track/(?P<track_id>[0-9]+)/?$','tracked.geo.views.show_track'),
+    (r'^os-track/(?P<track_id>[0-9]+)/?$','tracked.geo.views.show_os_track'),
     (r'^/?$', 'tracked.geo.views.home_page'),
     (r'index', 'tracked.geo.views.home_page'),
 )
