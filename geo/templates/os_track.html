@@ -1,0 +1,170 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{{track.name}} - {{track.length|floatformat:2}} miles of fun
+{% endblock %}
+
+{% block body_class %}map{% endblock %}
+
+{% block head_tags %}
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/css/jquery.lightbox.css" media="screen" />
+ 
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{GMAP_KEY}}" type="text/javascript"></script>
+<script type="text/javascript" charset="utf-8" src="{{MEDIA_URL}}/js/PolylineEncoder.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}/js/jquery.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}/js/jquery.lightbox.js"></script>
+
+<script type="text/javascript">
+
+        // Creates a marker at the given point with the given number label
+        function createMarker(point, img_url, img_large, img_name) {
+          var marker = new GMarker(point);
+          GEvent.addListener(marker, "click", function() {
+            var divvy = document.createElement('div');
+        
+            divvy.innerHTML = "<p class=\"thumb-caption\">"+img_name+"</p>\n<p><a href=\""+img_large+"\" class=\"thumb-img\" title=\""+img_name+"\"><img height=\"80\" width\"80\" alt='Photo taken at this location.' src=\"" + img_url + "\"/><span class=\"instruction\">&raquo;LIGHTBOX</span></a></p>";
+            $(divvy).find('a.thumb-img').lightBox({
+                overlayOpacity: 0.8,
+                imageLoading: '{{MEDIA_URL}}/img/loading.gif',
+                imageBtnClose: '{{MEDIA_URL}}/img/lightbox-btn-close.gif',
+                imageBtnPrev: '{{MEDIA_URL}}/img/lightbox-btn-prev.gif',
+                imageBtnNext: '{{MEDIA_URL}}/img/lightbox-btn-next.gif',
+                imageBlank:'{{MEDIA_URL}}/img/lightbox-blank.gif'
+            });
+            marker.openInfoWindow(divvy);
+          });
+          return marker;
+        }
+    
+    
+    var d = new Date();
+    //<![CDATA[
+    var starttime = d.getTime();
+    var report =  'starting:' + d.getTime();
+    
+    $(window).resize(function(){
+    
+        $('#map').height($(this).height() - 5);
+    });
+
+    $('#map').ready( function() {
+    
+        /* Bind event 
+        $('#map').click(function(e){
+            alert(e.target);
+        });
+        */  
+        var d = new Date();
+        report += 'domready:' + (d.getTime() - starttime ); 
+        $('#map').height( $(window).height() - 5 );
+    
+      if (GBrowserIsCompatible()) {
+        
+        // Create an array of the Glatlngs for this track's photos
+        var photo_latlons = new Array();
+        var photo_urls  = new Array();
+        
+        // and for the track route to build polyline
+        var track_latlons = new Array();
+        var track_photos = new Array();
+        var d = new Date();
+        report += ', embarking on track:' + (d.getTime() - starttime );
+        {% for wp in track.random_photos %}
+            p_marker = createMarker( new GLatLng( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) ,
+                'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}_s_d.jpg',
+                'http://farm{{wp.photo_farm}}.static.flickr.com/{{wp.photo_server}}/{{wp.photo_id}}_{{wp.photo_secret}}.jpg',
+                '{{wp.photo_title}} at {{wp.altitude|floatformat:2}}m');                
+            track_photos.push(p_marker );       
+        {% endfor %}
+        
+        {% for wp in track.gps_points %}
+                track_latlons.push( new GLatLng( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) );
+        {% endfor %}
+        
+        report += ', tlength:' + track_latlons.length;
+        var d = new Date();
+        report += ', track done:' + (d.getTime() - starttime );
+        
+        //map.setCenter(new GLatLng(56.776,-3.932), 13);
+
+        //create bounds object to set zoom level to fit all datapoints
+        var bounds = new GLatLngBounds();
+
+        // Loop through photo co-ords to set map bounds
+        for (i = 0; i < track_latlons.length; i++ ) {
+                bounds.extend(track_latlons[i]);            
+        }
+
+        var d = new Date();
+        report += ', bounds done:' + (d.getTime() - starttime );
+
+        // Create polyline from waypoints 
+        //var track_route = new GPolyline(track_latlons, "#0000FF", 2, 1);
+        
+        // Prepare for encoding!        
+        var polylineEncoder = new PolylineEncoder(9,4,0.00001,true);
+        var track_route = polylineEncoder.dpEncodeToGPolyline(track_latlons);
+        
+        
+        var d = new Date();
+        report += ', track done:' + (d.getTime() - starttime );
+        ;
+        var map = new GMap2( document.getElementById("map"),  {mapTypes:[G_HYBRID_MAP]} );
+        map.addControl(new GLargeMapControl());
+        map.addControl(new GMapTypeControl());
+        map.addControl(new GScaleControl());
+        //map.enableScrollWheelZoom();
+        map.addControl(new GOverviewMapControl());
+        map.setCenter(bounds.getCenter());
+        map.setZoom(map.getBoundsZoomLevel(bounds));
+        //map.setMapType(G_HYBRID_MAP);
+        
+        var d = new Date();
+        report += ', map done:' + (d.getTime() - starttime );
+        
+        var d = new Date();
+        report += ', photo adding done:' + (d.getTime() - starttime );
+        
+        map.addOverlay(track_route);
+        for (i in track_photos){
+            map.addOverlay(track_photos[i]);
+        }
+      }
+    })
+
+    //]]>
+
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="map"></div>
+<div id="info">
+<h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
+<table class="stats">
+    <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
+    <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
+</table>
+<h2>{{track.gpx_file.name}}</h2>
+<h3>Other tracks from this file</h3>
+<ul id="tracks">
+{%for t in track.gpx_file.track_set.all %}
+<li>
+    <!--
+    <a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
+        <img src="{{MEDIA_URL}}/img/XML.png" alt="XML Icon" />
+    </a>
+-->
+<a href="/track/{{t.id}}">{{t.start_time|date:"D M dS H:i"}}</a>
+    <!--
+    -{{t.end_time|date:"H:i"}}
+        -->
+ [{{t.length|floatformat:2}}M]
+</li>
+{%endfor%}
+</ul>  
+{% endblock %}
+
