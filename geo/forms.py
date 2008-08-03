@@ -1,5 +1,4 @@
 from django import forms
-from django.newforms import ModelForm
 from tracked.settings import MEDIA_ROOT
 from tracked.geo.models import GpxFile
 from django.forms.extras import SelectDateWidget
@@ -13,7 +12,7 @@ class DateSearch(forms.Form):
     to_date   = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))
 
 
-class UploadFormTwo(ModelForm):
+class UploadFormTwo(forms.ModelForm):
     class Meta:
         model = GpxFile
         fields = ('name','description','filename')

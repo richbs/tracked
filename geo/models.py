@@ -53,12 +53,13 @@ class GpxFile(models.Model):
     filename    = models.FileField(upload_to='xml',blank=True,validator_list=[gpx_file_size,gpx_file_name])
     waypoints   = models.ManyToManyField(WayPoint,blank=True,editable=False)
 
-    def create_tracks(self, min_interval=60, max_interval=3500, min_length=1):
+    def create_tracks(self, min_interval=30, max_interval=1800, min_length=0.3):
         """
         min_interval    = 60
         max_interval    = 3500
         min_length      = 1        
         """
+        print 'creating tracks'
         # Our waypoints for this jaunt
         waypoints = self.waypoints.all().order_by('gmtime')
 
@@ -108,9 +109,19 @@ class GpxFile(models.Model):
                         track.name = "%s %d" % ( self.name, track_count)
                         track.save()
                         self.track_set.add(track)
-                         # maybe pop off waypoint first and last here then write a function for track to update itself                        
-                        #track.waypoints.all().order_by('gmtime')[0].delete()
-                        #track.waypoints.all().order_by('-gmtime')[0].delete()
+                                               
+                        # Normalise altitude of first waypoint
+                        w1 = track.waypoints.all().order_by('gmtime')[0]
+                        w2 = track.waypoints.all().order_by('gmtime')[1]
+                        w1.altitude = w2.altitude
+                        w1.save()
+
+                        # Normalise altitude of last waypoint
+                        w1 = track.waypoints.all().order_by('-gmtime')[1]
+                        w2 = track.waypoints.all().order_by('-gmtime')[2]
+                        w1.altitude = w2.altitude
+                        w1.save()
+                        
                         track.update_data()                                     
 
                     else:
@@ -135,8 +146,8 @@ class GpxFile(models.Model):
                     length = 0
                     track.waypoints.add(wp)
                     previous = wp
-                elif too_short:
-                    previous = previous
+                #elif too_short:
+                #    previous = previous
                 else:
                     length += get_distance(previous,wp)
                     track.waypoints.add(wp)
@@ -149,8 +160,6 @@ class GpxFile(models.Model):
             track.name = "%s %d" % ( self.name, track_count)            
             track.save()
             self.track_set.add(track)
-            track.waypoints.all().order_by('gmtime')[0].delete()
-            track.waypoints.all().order_by('-gmtime')[0].delete()
             track.update_data()                                     
 
         else:
@@ -160,6 +169,7 @@ class GpxFile(models.Model):
         """
         Convert XML points to WayPoint nodes
         """
+        print 'processing xml'
         gpxlog = pulldom.parse(MEDIA_ROOT +  self.filename)
 
         for event,node in gpxlog:
@@ -353,9 +363,7 @@ class Track(models.Model):
         self.end_time  = previous.localtime
         self.save()
         self.get_photos()
-    
-    class Admin:
-        pass
+
 
 class Trip(models.Model):
     def __unicode__(self):
@@ -369,8 +377,7 @@ class Trip(models.Model):
     length = models.DecimalField(max_digits=10, decimal_places=5)
     tracks = models.ManyToManyField(Track)
     
-    class Admin:
-        pass
+
 
 
     
