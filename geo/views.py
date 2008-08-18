@@ -59,8 +59,12 @@ def upload(request):
     
 def show_track(request, track_id):
     
-    assert False, request.GET
     track = Track.objects.select_related().get(id=track_id)
+    
+    if 'offset' in request.GET:
+        mins_offset = int(request.GET['offset'])
+        track.get_photos(offset_minutes = mins_offset)
+   
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
     #assert False, track.random_photos()

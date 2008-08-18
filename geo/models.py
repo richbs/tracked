@@ -5,7 +5,7 @@ import time
 from tracked.geo.helpers import get_distance, UTC
 from tracked.geo.validators import FilenameMatchesRegularExpression, HasAllowableSize
 from tracked.settings import MEDIA_ROOT, FLICKR_KEY
-
+import os, settings
 import flickrapi
 
 gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
@@ -53,7 +53,7 @@ class GpxFile(models.Model):
     filename    = models.FileField(upload_to='xml',blank=True,validator_list=[gpx_file_size,gpx_file_name])
     waypoints   = models.ManyToManyField(WayPoint,blank=True,editable=False)
 
-    def create_tracks(self, min_interval=30, max_interval=1800, min_length=0.3):
+    def create_tracks(self, min_interval=30, max_interval=2700, min_length=0.3):
         """
         min_interval    = 60
         max_interval    = 3500
@@ -170,7 +170,8 @@ class GpxFile(models.Model):
         Convert XML points to WayPoint nodes
         """
         print 'processing xml'
-        gpxlog = pulldom.parse(MEDIA_ROOT +  self.filename)
+        file_name = str(self.filename)
+        gpxlog = pulldom.parse(os.path.join(settings.MEDIA_ROOT, file_name))
 
         for event,node in gpxlog:
             # Only construct a dom from the track points
@@ -237,7 +238,7 @@ class Track(models.Model):
     altitude_min = models.DecimalField(max_digits=10, decimal_places=5)
     waypoints   = models.ManyToManyField(WayPoint,editable=False)
     gpx_file = models.ForeignKey(GpxFile,edit_inline=models.TABULAR,core=True,num_extra_on_change=1,num_in_admin=1)
-    _offset_timedelta = None
+    _offset_timedelta = timedelta(seconds=0)
     
     def waypoints_ordered(self):
         """all waypoints for this track in order by time"""
@@ -261,21 +262,28 @@ class Track(models.Model):
             # Do we have a waypoint to compare with?
             
             if prev_wp:
-                # If this photo is taken between the two waypoints in the loop
-                if prev_wp.localtime < photo_dt and w.localtime > photo_dt:
                 
+                prev_adjusted = ( prev_wp.localtime + self._offset_timedelta)
+                w_adjusted = ( w.localtime + self._offset_timedelta )
+                # If this photo is taken between the two waypoints in the loop
+                if prev_adjusted < photo_dt and w_adjusted > photo_dt:
+                    
+                    print prev_adjusted
+                    print 'p', photo_dt
+                    print w_adjusted
                     
                     # get the timedelata between the waypoints
-                    td = w.localtime - prev_wp.localtime
+                    td = w_adjusted - prev_adjusted
                     total_difference = td.seconds
-                    
+
                     # calculate the timedelta between the first waypoint and the phot being taken
-                    td = photo_dt - prev_wp.localtime
+                    td = photo_dt - prev_adjusted
+
                     photo_difference = td.seconds
                     
                     # create a factor that plots the point between the two waypoint timings the photo was taken
                     dfactor = photo_difference / float(total_difference)
-                    
+
                     # multiply the difference between the lat/lon/alt of the waypoins by this factor
                     photo_lat = float(prev_wp.latitude) + ((float(w.latitude) - float(prev_wp.latitude)) * dfactor)
                     photo_lon = float(prev_wp.longitude) + ((float(w.longitude) - float(prev_wp.longitude)) * dfactor)
@@ -283,19 +291,30 @@ class Track(models.Model):
                     
                     # Prepare a waypoint object to store the results of the geotagging calculations
                     
-                    photo_waypoint, created = WayPoint.objects.get_or_create(
+                    photo_waypoints = WayPoint.objects.filter(
 
                             photo_id=xml_photo['id'],
-                            photo_title=xml_photo['title'],
-                            photo_secret=xml_photo['secret'],
-                            photo_farm=xml_photo['farm'],
-                            photo_server=xml_photo['server'],
+
                     );
-                    photo_waypoint.latitude=photo_lat,
-                    photo_waypoint.longitude=photo_lon,
-                    photo_waypoint.altitude=photo_alt,
-                    photo_waypoint.gmtime=photo_dt,
-                    photo_waypoint.localtime=photo_dt,
+                    if len(photo_waypoints) > 0:
+                        
+                        photo_waypoint = photo_waypoints[0]
+                        
+                    else:
+                        photo_waypoint = WayPoint()
+                        photo_waypoint.photo_id=xml_photo['id']
+                        
+                    photo_waypoint.photo_title=xml_photo['title']
+                    photo_waypoint.photo_secret=xml_photo['secret']
+                    photo_waypoint.photo_farm=xml_photo['farm']
+                    photo_waypoint.photo_server=xml_photo['server']
+     
+                    photo_waypoint.latitude=str(photo_lat)
+                    photo_waypoint.longitude=str(photo_lon)
+                    photo_waypoint.altitude=str(photo_alt)
+                    photo_waypoint.gmtime=photo_dt
+                    photo_waypoint.localtime=photo_dt - self._offset_timedelta
+
                     photo_waypoint.save()
                     #except:
                      #   assert False, '.' + xml_photo['id'] + '.'
@@ -308,13 +327,14 @@ class Track(models.Model):
     def get_photos(self, flickr_user="38584744@N00", offset_minutes=0):
         
         offset_td = timedelta(seconds=int(offset_minutes)*60)
-            #negative
-        
+        self._offset_timedelta = offset_td
+        self.waypoints.filter(photo_id__isnull=False).delete()
+        # negative
         flickr = flickrapi.FlickrAPI(FLICKR_KEY)
-        result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time, min_taken_date=self.start_time,extras='date_taken')
+        result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time + offset_td, min_taken_date=self.start_time + offset_td, extras='date_taken')
                             
         geophotos = []
-
+        
         if int(result.photos[0]["total"]) > 0:
             for ph in result.photos[0].photo:
                 gp = self.geotag_photo(ph)
