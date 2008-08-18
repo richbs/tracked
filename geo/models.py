@@ -1,11 +1,12 @@
 from django.db import models
 from xml.dom import pulldom
 from datetime import datetime, timedelta
-import time
+import time, os
 from tracked.geo.helpers import get_distance, UTC
 from tracked.geo.validators import FilenameMatchesRegularExpression, HasAllowableSize
-from tracked.settings import MEDIA_ROOT, FLICKR_KEY
-import os, settings
+
+from django.conf import settings
+
 import flickrapi
 
 gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
@@ -330,7 +331,7 @@ class Track(models.Model):
         self._offset_timedelta = offset_td
         self.waypoints.filter(photo_id__isnull=False).delete()
         # negative
-        flickr = flickrapi.FlickrAPI(FLICKR_KEY)
+        flickr = flickrapi.FlickrAPI(settings.FLICKR_KEY)
         result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time + offset_td, min_taken_date=self.start_time + offset_td, extras='date_taken')
                             
         geophotos = []
