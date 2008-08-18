@@ -58,6 +58,8 @@ def upload(request):
         return render_to_response('upload.html', {'form':form})
     
 def show_track(request, track_id):
+    
+    assert False, request.GET
     track = Track.objects.select_related().get(id=track_id)
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
@@ -71,6 +73,7 @@ def show_os_track(request, track_id):
     #assert False, track.random_photos()
     
     return render_to_response('os_track.html', {'track':track},context_instance=RequestContext(request))
+
 
 
 def dates(request,date_from,date_to):

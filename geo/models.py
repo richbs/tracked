@@ -1,6 +1,6 @@
 from django.db import models
 from xml.dom import pulldom
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from tracked.geo.helpers import get_distance, UTC
 from tracked.geo.validators import FilenameMatchesRegularExpression, HasAllowableSize
@@ -237,6 +237,7 @@ class Track(models.Model):
     altitude_min = models.DecimalField(max_digits=10, decimal_places=5)
     waypoints   = models.ManyToManyField(WayPoint,editable=False)
     gpx_file = models.ForeignKey(GpxFile,edit_inline=models.TABULAR,core=True,num_extra_on_change=1,num_in_admin=1)
+    _offset_timedelta = None
     
     def waypoints_ordered(self):
         """all waypoints for this track in order by time"""
@@ -283,18 +284,18 @@ class Track(models.Model):
                     # Prepare a waypoint object to store the results of the geotagging calculations
                     
                     photo_waypoint, created = WayPoint.objects.get_or_create(
-                            latitude=photo_lat,
-                            longitude=photo_lon,
-                            altitude=photo_alt,
-                            gmtime=photo_dt,
-                            localtime=photo_dt,
+
                             photo_id=xml_photo['id'],
                             photo_title=xml_photo['title'],
-                            photo_description='hmm',
                             photo_secret=xml_photo['secret'],
                             photo_farm=xml_photo['farm'],
                             photo_server=xml_photo['server'],
-                        );
+                    );
+                    photo_waypoint.latitude=photo_lat,
+                    photo_waypoint.longitude=photo_lon,
+                    photo_waypoint.altitude=photo_alt,
+                    photo_waypoint.gmtime=photo_dt,
+                    photo_waypoint.localtime=photo_dt,
                     photo_waypoint.save()
                     #except:
                      #   assert False, '.' + xml_photo['id'] + '.'
@@ -304,7 +305,10 @@ class Track(models.Model):
         
         return False
     
-    def get_photos(self, flickr_user="38584744@N00"):
+    def get_photos(self, flickr_user="38584744@N00", offset_minutes=0):
+        
+        offset_td = timedelta(seconds=int(offset_minutes)*60)
+            #negative
         
         flickr = flickrapi.FlickrAPI(FLICKR_KEY)
         result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time, min_taken_date=self.start_time,extras='date_taken')
