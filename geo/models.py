@@ -327,6 +327,7 @@ class Track(models.Model):
                             photo_id=int(xml_photo['id']),
 
                     );
+                    
                     if len(photo_waypoints) > 0:
                         
                         photo_waypoint = photo_waypoints[0]
@@ -347,7 +348,7 @@ class Track(models.Model):
                     photo_waypoint.localtime=photo_dt - self._offset_timedelta
                     
                     photo_waypoint.save()
-                    assert False, [photo_waypoint.photo_id, xml_photo['id'], xml_photo['title'] , len(str(photo_waypoint.photo_id))]
+                    assert False, [photo_waypoints, photo_waypoint.photo_id, xml_photo['id'], xml_photo['title'] , len(str(photo_waypoint.photo_id))]
                     #except:
                      #   assert False, '.' + xml_photo['id'] + '.'
                     return photo_waypoint
