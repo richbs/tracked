@@ -335,17 +335,17 @@ class Track(models.Model):
                         photo_waypoint = WayPoint()
                         photo_waypoint.photo_id=int(xml_photo['id'])
                         
-                    photo_waypoint.photo_title=xml_photo['title']
-                    photo_waypoint.photo_secret=xml_photo['secret']
-                    photo_waypoint.photo_farm=xml_photo['farm']
-                    photo_waypoint.photo_server=xml_photo['server']
+                    #photo_waypoint.photo_title=xml_photo['title']
+                    #photo_waypoint.photo_secret=xml_photo['secret']
+                    #photo_waypoint.photo_farm=xml_photo['farm']
+                    #photo_waypoint.photo_server=xml_photo['server']
      
                     photo_waypoint.latitude=str(photo_lat)
                     photo_waypoint.longitude=str(photo_lon)
                     photo_waypoint.altitude=str(photo_alt)
                     photo_waypoint.gmtime=photo_dt
                     photo_waypoint.localtime=photo_dt - self._offset_timedelta
-
+                    assert False, [photo_waypoint.photo_id, xml_photo['id'], xml_photo['title'] , len(photo_waypoint.photo_id)]
                     photo_waypoint.save()
                     #except:
                      #   assert False, '.' + xml_photo['id'] + '.'
