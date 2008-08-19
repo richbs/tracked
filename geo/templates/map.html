@@ -34,6 +34,10 @@
  [{{t.length|floatformat:2}}M]
 </li>
 {%endfor%}
-</ul>  
+</ul>
+<form action="/geotag" method="post">
+<input type="hidden" name="track_id" value="{{track.id}}" />
+<input type="submit" name="subit-geotag" value="Geo Tag Images in Flickr"/>
+</form>
 {% endblock %}
 

@@ -67,12 +67,23 @@ class GpxFile(models.Model):
         # Set up accumulating variables
         previous        = False
         length = 0
-        track_count = 0
+        track_count = 1
         # Set the first times on the trap
         first_wp = waypoints[0]
         # Create first track and 0 out variables
-        track           = Track()
-        track.name      = ''
+        print first_wp.localtime , "%s %d" % ( self.name, track_count)
+        tracks               = Track.objects.filter(start_time=first_wp.localtime)
+        if tracks:
+            track = tracks[0]
+            index = 0
+            for mt in tracks:
+                if index > 0:
+                    mt.delete()
+                index += 1
+
+        else:
+            track = Track()
+        track.name="%s %d" % ( self.name, track_count)
         track.description   = ''
         track.length        = 0
         track.ascent          = 0
@@ -106,7 +117,7 @@ class GpxFile(models.Model):
 
                     # Add track if it's long enough
                     if length > min_length:
-                        track_count += 1
+                        
                         track.name = "%s %d" % ( self.name, track_count)
                         track.save()
                         self.track_set.add(track)
@@ -118,8 +129,8 @@ class GpxFile(models.Model):
                         w1.save()
 
                         # Normalise altitude of last waypoint
-                        w1 = track.waypoints.all().order_by('-gmtime')[1]
-                        w2 = track.waypoints.all().order_by('-gmtime')[2]
+                        w1 = track.waypoints.all().order_by('-gmtime')[0]
+                        w2 = track.waypoints.all().order_by('-gmtime')[1]
                         w1.altitude = w2.altitude
                         w1.save()
                         
@@ -127,10 +138,22 @@ class GpxFile(models.Model):
 
                     else:
                         track.delete()
-
+                    # 
+                    track_count += 1
                     # Create new track and 0 out variables
-                    track               = Track()
-                    track.name          = "%s: %d" % ( self.name, track_count)
+                    tracks               = Track.objects.filter(start_time=wp.localtime)
+                    if tracks:
+                        track = tracks[0]
+                        index = 0
+                        for mt in tracks:
+                            if index > 0:
+                                mt.delete()
+                            index += 1
+
+                    else:
+                        track = Track()
+                    
+                    track.name="%s %d" % ( self.name, track_count)
                     track.description   = ''
                     track.length        = 0
                     track.ascent        = 0
@@ -187,7 +210,10 @@ class GpxFile(models.Model):
                     elestring = ''.join([x.nodeValue for x in elenode[0].childNodes])
                     lat = node.getAttribute('lat')
                     lon = node.getAttribute('lon')
-                    timeob = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ')
+                    try:
+                        timeob = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ')
+                    except ValueError:
+                        timeob = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%S.000Z')
                     timeob2 = timeob.replace(tzinfo=UTC)
                     timo = time.mktime( timeob2.timetuple() )
                     tupelo = time.localtime(timo)
@@ -245,6 +271,10 @@ class Track(models.Model):
         """all waypoints for this track in order by time"""
         return self.waypoints.select_related().order_by('localtime')
     
+    def photos(self):
+        """All photos associated with track"""
+        return self.waypoints.filter(photo_id__isnull=False)
+        
     def random_photos(self):
         """10 waypoints from flickr"""
         return self.waypoints.filter(photo_id__isnull=False).order_by('?')[:10]
@@ -325,13 +355,13 @@ class Track(models.Model):
         
         return False
     
-    def get_photos(self, flickr_user="38584744@N00", offset_minutes=0):
+    def get_photos(self, flickr_user="38584744@N00", offset_minutes=0, token=None):
         
         offset_td = timedelta(seconds=int(offset_minutes)*60)
         self._offset_timedelta = offset_td
         self.waypoints.filter(photo_id__isnull=False).delete()
         # negative
-        flickr = flickrapi.FlickrAPI(settings.FLICKR_KEY)
+        flickr = flickrapi.FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET, token = token)
         result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time + offset_td, min_taken_date=self.start_time + offset_td, extras='date_taken')
                             
         geophotos = []
