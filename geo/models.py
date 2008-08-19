@@ -346,7 +346,7 @@ class Track(models.Model):
                     photo_waypoint.altitude=str(photo_alt)
                     photo_waypoint.gmtime=photo_dt
                     photo_waypoint.localtime=photo_dt - self._offset_timedelta
-                    
+                    assert False, [photo_waypoints, photo_waypoint.photo_id, xml_photo['id'], xml_photo['title'] , len(str(photo_waypoint.photo_id))]
                     photo_waypoint.save()
                     assert False, [photo_waypoints, photo_waypoint.photo_id, xml_photo['id'], xml_photo['title'] , len(str(photo_waypoint.photo_id))]
                     #except:
