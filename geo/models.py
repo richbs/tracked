@@ -361,7 +361,7 @@ class Track(models.Model):
         self._offset_timedelta = offset_td
         self.waypoints.filter(photo_id__isnull=False).delete()
         # negative
-        flickr = flickrapi.FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET, token = token)
+        flickr = flickrapi.FlickrAPI(api_key=settings.FLICKR_KEY, secret=settings.FLICKR_SECRET, token = token)
         result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time + offset_td, min_taken_date=self.start_time + offset_td, extras='date_taken')
                             
         geophotos = []

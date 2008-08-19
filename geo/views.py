@@ -33,8 +33,8 @@ def require_flickr_auth(view):
             token = None
             log.info('No token in session')
 
-        f = flickrapi.FlickrAPI(settings.FLICKR_KEY,
-               settings.FLICKR_SECRET, token=token,
+        f = flickrapi.FlickrAPI(api_key=settings.FLICKR_KEY,
+               secret=settings.FLICKR_SECRET, token=token,
                store_token=False)
 
         if token:
@@ -67,8 +67,8 @@ def require_flickr_auth(view):
 def callback(request):
     log.info('We got a callback from Flickr, store the token')
 
-    f = flickrapi.FlickrAPI(settings.FLICKR_KEY,
-           settings.FLICKR_SECRET, store_token=False)
+    f = flickrapi.FlickrAPI(api_key=settings.FLICKR_KEY,
+           secret=settings.FLICKR_SECRET, store_token=False)
 
     frob = request.GET['frob']
     token = f.get_token(frob)
@@ -137,7 +137,8 @@ def get_photos(request, track_id):
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
     #assert False, track.random_photos()
-    return render_to_response('track.html', {'track':track},context_instance=RequestContext(request))        
+    return render_to_response('track.html', {'track':track},context_instance=RequestContext(request))
+  
 def show_track(request, track_id):
     
     track = Track.objects.select_related().get(id=track_id)
@@ -180,7 +181,7 @@ def between_tracks(request):
                 last_old = prev.waypoints.all().order_by('-localtime')[0]
                 first_new = t.waypoints.all().order_by('localtime')[0]
                 
-                flickr = flickrapi.FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET, token = token)
+                flickr = flickrapi.FlickrAPI(api_key=settings.FLICKR_KEY, secret=settings.FLICKR_SECRET, token = token)
                 result = flickr.photos_search(user_id=settings.FLICKR_USER, max_taken_date=first_new.localtime + offset_td, min_taken_date=last_old.localtime + offset_td, extras='date_taken')
                                     
                 geophotos = []
@@ -198,7 +199,7 @@ def geo_tag(request):
         track = Track.objects.select_related().get(id=request.POST['track_id'])
     
         fps = track.photos()
-        flickr = flickrapi.FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET, token=request.session['token'])
+        flickr = flickrapi.FlickrAPI(api_key=settings.FLICKR_KEY, secret=settings.FLICKR_SECRET, token=request.session['token'])
   
         for pho in fps:
             print 'Tagging: ' + str(pho.photo_title)
