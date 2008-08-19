@@ -54,7 +54,7 @@ class GpxFile(models.Model):
     filename    = models.FileField(upload_to='xml',blank=True,validator_list=[gpx_file_size,gpx_file_name])
     waypoints   = models.ManyToManyField(WayPoint,blank=True,editable=False)
 
-    def create_tracks(self, min_interval=30, max_interval=2700, min_length=0.3):
+    def create_tracks(self, min_interval=30, max_interval=2700, min_length=0.1):
         """
         min_interval    = 60
         max_interval    = 3500
@@ -387,7 +387,7 @@ class Track(models.Model):
         self.altitude_min = str(round(altitude_min,5))
         self.end_time  = previous.localtime
         self.save()
-        self.get_photos()
+        #self.get_photos()
 
 
 class Trip(models.Model):
