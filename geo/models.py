@@ -324,7 +324,7 @@ class Track(models.Model):
                     
                     photo_waypoints = WayPoint.objects.filter(
 
-                            photo_id=xml_photo['id'],
+                            photo_id=int(xml_photo['id']),
 
                     );
                     if len(photo_waypoints) > 0:
@@ -333,7 +333,7 @@ class Track(models.Model):
                         
                     else:
                         photo_waypoint = WayPoint()
-                        photo_waypoint.photo_id=xml_photo['id']
+                        photo_waypoint.photo_id=int(xml_photo['id'])
                         
                     photo_waypoint.photo_title=xml_photo['title']
                     photo_waypoint.photo_secret=xml_photo['secret']
