@@ -181,6 +181,13 @@ def show_os_track(request, track_id):
     
     return render_to_response('os_track.html', {'track':track},context_instance=RequestContext(request))
 
+def os_route(request):
+    #geophotos = track.get_photos()
+    #gpxfile = track.gpx_file
+    #assert False, track.random_photos()
+    
+    return render_to_response('os_route.html',context_instance=RequestContext(request))
+
 def between_tracks(request):
     
     if 'file_id' in request.GET:
