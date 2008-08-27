@@ -1,8 +1,26 @@
 from django.contrib import admin
-
+from django import forms
 from tracked.geo.models import GpxFile, Track, WayPoint, Trip
 
+
+class GpxFileAdminForm(forms.ModelForm):
+    class Meta:
+        model = GpxFile
+    
+    def clean_filename(self):
+        if not self.cleaned_data['filename'].name.endswith('.gpx'):
+            raise forms.ValidationError('filename must end with .gpx')
+        
+        if self.cleaned_data['filename'].size > 1300000:
+            raise forms.ValidationError('%s is too large.' % self.cleaned_data['filename'])
+        
+        return self.cleaned_data['filename']
+        
+
+
 class GpxFileAdmin(admin.ModelAdmin):
+    
+    form = GpxFileAdminForm
     
     fieldsets = (
         (None, {

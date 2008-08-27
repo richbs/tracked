@@ -3,14 +3,14 @@ from xml.dom import pulldom
 from datetime import datetime, timedelta
 import time, os
 from tracked.geo.helpers import get_distance, UTC
-from tracked.geo.validators import FilenameMatchesRegularExpression, HasAllowableSize
+#from tracked.geo.validators import FilenameMatchesRegularExpression, HasAllowableSize
 
 from django.conf import settings
 
 import flickrapi
 
-gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
-gpx_file_name = FilenameMatchesRegularExpression('^[^ ]{3,80}\.gpx$', 'Filename must end in GPX')
+#gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
+#gpx_file_name = FilenameMatchesRegularExpression('^[^ ]{3,80}\.gpx$', 'Filename must end in GPX')
     
 class WayPoint(models.Model):
     """A point in space and time
@@ -51,7 +51,7 @@ class GpxFile(models.Model):
 
     name        = models.CharField( max_length=100)
     description = models.CharField(blank=True, max_length=255)
-    filename    = models.FileField(upload_to='xml',blank=True,validator_list=[gpx_file_size,gpx_file_name])
+    filename    = models.FileField(upload_to='xml',blank=True)
     waypoints   = models.ManyToManyField(WayPoint,blank=True,editable=False)
 
     def create_tracks(self, min_interval=30, max_interval=2700, min_length=0.1):
@@ -254,7 +254,7 @@ class Track(models.Model):
     def __unicode__(self):
         return "%s %s-%s" % (self.name, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), self.end_time.strftime('%H:%M:%S') )
 
-    name        = models.CharField( max_length=100,db_index=True, core=True)
+    name        = models.CharField( max_length=100,db_index=True)
     description = models.CharField(blank=True, max_length=255)
     start_time  = models.DateTimeField(db_index=True)
     end_time    = models.DateTimeField(db_index=True)
@@ -264,7 +264,7 @@ class Track(models.Model):
     altitude_max = models.DecimalField(max_digits=10, decimal_places=5)
     altitude_min = models.DecimalField(max_digits=10, decimal_places=5)
     waypoints   = models.ManyToManyField(WayPoint,editable=False)
-    gpx_file = models.ForeignKey(GpxFile,edit_inline=models.TABULAR,core=True,num_extra_on_change=1,num_in_admin=1)
+    gpx_file = models.ForeignKey(GpxFile)
     _offset_timedelta = timedelta(seconds=0)
     
     def waypoints_ordered(self):
