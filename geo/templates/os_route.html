@@ -20,20 +20,51 @@ mytracks.net - plan your route
 
     var starttime = d.getTime();
     var report =  'starting:' + d.getTime();
-    var route = new Array();
-    var marker_number = 1;
+    var route = [];
+	var route_line;
+    var marker_number = 0;
+	
+	
+	function getRouteLength(given_route) {
+		var route_distance = 0;		
+		for (i =0; i < given_route.length; i++) {
+
+
+			if (i > 0) {
+				
+				route_distance += mapviewer.getGreatCircleDistance( given_route[i -1 ].getPosition(), given_route[i].getPosition() );
+			}
+			
+		}
+		$('#route-length').text(route_distance.toFixed(2));
+		return route_distance;
+	}
+	
 	function addDraggableMarker() {
 	
 	    var pos = mapviewer.getCurrentPosition(); 
 	    var marker = mapviewer.createMarker( pos, {'label' : 'Draggable marker', 'draggable' : true } );
-	    marker.number = marker_number
-	    route[marker_number] = marker
+	    marker.number = marker_number;
+	    route[marker_number] = marker;
 		marker_number++;
-	    alert(route.length);
-	} 
+		getRouteLength(route);
+	}
+	
+	function  addPolyline (points, color, opacity, thickness,  closed, fill) {
+	    if (polyline) polyline.remove();
+	    polyline = new MMPolyLineOverlay( points, color, opacity, thickness,  closed, fill );
+	    mapviewer.addOverlay(polyline);
+	}
+	
 	function moveMarker(eventType, eventTarget, arg1, arg2, arg3 ) {
 	
-	    alert(eventTarget.number);
+		    
+		var marker_number_here = eventTarget.number
+		var marker_here = eventTarget //mapviewer.createMarker( eventTarget.getPosition(), {'label' : 'Draggable marker', 'draggable' : true } );
+	    marker_here.number = marker_number_here;
+	    route[marker_number_here] = marker_here;
+		getRouteLength(route);		
+		return marker_here;
 	    
 	}
 
@@ -84,6 +115,7 @@ mytracks.net - plan your route
         mapviewer.addOverlay(polyline);
         mapviewer.drawAndPositionMap(loca);
     */
+	
     });
 
     //]]>
