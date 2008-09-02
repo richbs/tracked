@@ -23,39 +23,57 @@ mytracks.net - plan your route
     var route = [];
 	var route_line;
     var marker_number = 0;
-	
+	var polyline;
+	var mapviewer;
 	
 	function getRouteLength(given_route) {
 		var route_distance = 0;		
-		for (i =0; i < given_route.length; i++) {
+		for (i =0; i < given_route.length && given_route.length > 1; i++) {
 
 
 			if (i > 0) {
 				
 				route_distance += mapviewer.getGreatCircleDistance( given_route[i -1 ].getPosition(), given_route[i].getPosition() );
+
 			}
-			
+
+
 		}
+		
 		$('#route-length span').text(route_distance.toFixed(2));
+		addPolyline(given_route);
 		return route_distance;
 	}
 	
 	function addDraggableMarker() {
 	
 	    var pos = mapviewer.getCurrentPosition(); 
-	    var marker = mapviewer.createMarker( pos, {'label' : 'Draggable marker', 'draggable' : true } );
+	    var marker = mapviewer.createMarker( pos, {'text': marker_number + 1 , 'label' : 'Draggable marker', 'draggable' : true } );
 	    marker.number = marker_number;
 	    route[marker_number] = marker;
 		marker_number++;
 		getRouteLength(route);
+		
 	}
 	
-	function  addPolyline (points, color, opacity, thickness,  closed, fill) {
-	    if (polyline) polyline.remove();
-	    polyline = new MMPolyLineOverlay( points, color, opacity, thickness,  closed, fill );
+	function  addPolyline (markers, color, opacity, thickness,  closed, fill) {
+		if(polyline) polyline.remove();
+		points = []
+	    for( i = 0; i < markers.length; i++ ) {
+			// Get MMLocation
+			loca = markers[i].getPosition();
+			// Get MMLatLon
+			lalo = loca.coords
+			
+			points.push( lalo );
+			
+		}
+		polyline = new MMPolyLineOverlay( points,  color, opacity, thickness,  closed, fill);
+		
 	    mapviewer.addOverlay(polyline);
+
 	}
-	
+
 	function moveMarker(eventType, eventTarget, arg1, arg2, arg3 ) {
 	
 		    
@@ -88,11 +106,14 @@ mytracks.net - plan your route
         $('#map').height( $(window).height() - 5 );
                   //Add the map
         mapviewer = new MMFactory.createViewer( document.getElementById( 'map' ) );
-        mapviewer.goToPosition( new MMLatLon( 52.2, 0.14 ) );
+        mapviewer.goToPosition( new MMLatLon( 54.45,-3.03049 ) );
         MMDataResolver.setDataPreferences(MM_WORLD_MAP, [904]);
         mapviewer.addWidget(new MMSmallPanZoomWidget());
-        mapviewer.setAllowedZoomFactors(13, 15);
+        mapviewer.setAllowedZoomFactors(13,
+		 15);
         mapviewer.addEventHandler('overlayEndDrag', moveMarker);
+        overview_widget = new MMOverviewWidget ();
+	    mapviewer.addWidget ( overview_widget );		
         /*
 		// and for the track route to build polyline
         var track_latlons = new Array();
