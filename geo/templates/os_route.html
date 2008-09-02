@@ -36,7 +36,7 @@ mytracks.net - plan your route
 			}
 			
 		}
-		$('#route-length').text(route_distance.toFixed(2));
+		$('#route-length span').text(route_distance.toFixed(2));
 		return route_distance;
 	}
 	
@@ -133,7 +133,7 @@ mytracks.net - plan your route
 <div id="info">
 <h1>Track Info</h1>
 <table class="stats">
-    <tr><th scope="row">Length</th><td id="route-length"> M</td></tr>
+    <tr><th scope="row">Length</th><td id="route-length"><span> </span> miles</td></tr>
 </table>
 <p><a href="#" id="add-marker">Add waypoint</a></p>
 </div>
