@@ -134,7 +134,30 @@ def get_photos(request, track_id):
     if 'offset' in request.GET:
         mins_offset = int(request.GET['offset'])
     print track.get_photos(offset_minutes = mins_offset, token=request.session['token'])
+    prev = None
+    next = None
+    found_prev = False
+    found_next = False
 
+    alltracks = track.gpx_file.track_set.all().order_by('start_time')
+    
+    for tr in alltracks:
+        if tr.start_time == track.start_time:
+            found_prev = prev
+        if prev:   
+            if prev.start_time == track.start_time:
+                found_next = tr
+        prev = tr
+    
+    first_current = track.waypoints.all().order_by('localtime')[0]
+    last_current = track.waypoints.all().order_by('-localtime')[0]
+    
+    if found_prev:
+        last_old = found_prev.waypoints.all().order_by('-localtime')[0]
+        print last_old, first_current
+    if found_next:
+        first_next = found_next.waypoints.all().order_by('localtime')[0]
+        print last_current, first_next
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
     #assert False, track.random_photos()
@@ -147,27 +170,8 @@ def show_track(request, track_id):
     if 'offset' in request.GET:
         mins_offset = int(request.GET['offset'])
         track.get_photos(offset_minutes = mins_offset)
-    alltracks = track.gpx_file.track_set.all().order_by('start_time')
-    
-    prev = None
-    next = None
-    found_prev = False
-    found_next = False
-    
-    for tr in alltracks:
-        if tr.start_time == track.start_time:
-            found_prev = prev
-        if prev:   
-            if prev.start_time == track.start_time:
-                found_next = tr
-        
-        prev = tr
-    print found_prev, track, found_next
-    last_old = found_prev.waypoints.all().order_by('-localtime')[0]
-    first_current = track.waypoints.all().order_by('localtime')[0]
-    last_current = track.waypoints.all().order_by('-localtime')[0]
-    first_next = found_next.waypoints.all().order_by('localtime')[0]
-    print last_old, first_current, last_current, first_next
+
+        #print last_old, first_current, last_current, first_next
     #geophotos = track.get_photos()
     #gpxfile = track.gpx_file
     #assert False, track.random_photos()

@@ -12,7 +12,11 @@
 
         // Creates a marker at the given point with the given number label
         function createMarker(point, img_url, img_large, img_name) {
-          var marker = new GMarker(point);
+			
+		var image_icon = new GIcon(G_DEFAULT_ICON);
+		image_icon.image = img_url;
+		image_icon.shadow = '';
+          var marker = new GMarker(point, {icon:image_icon});
           GEvent.addListener(marker, "click", function() {
 			var divvy = document.createElement('div');
 		

@@ -355,15 +355,20 @@ class Track(models.Model):
         
         return False
     
-    def get_photos(self, flickr_user="38584744@N00", offset_minutes=0, token=None):
+    def get_flickr_between(self, t1, t2, offset_minutes=0 , token=None):
         
         offset_td = timedelta(seconds=int(offset_minutes)*60)
         self._offset_timedelta = offset_td
+        flickr = flickrapi.FlickrAPI(api_key=settings.FLICKR_KEY, secret=settings.FLICKR_SECRET, token = token)
+        result = flickr.photos_search(user_id=settings.FLICKR_USER , max_taken_date=t2 + offset_td, min_taken_date=t1 + offset_td, extras='date_taken')
+        return result
+        
+    def get_photos(self, flickr_user="38584744@N00", offset_minutes=0, token=None):
+        
         self.waypoints.filter(photo_id__isnull=False).delete()
         # negative
-        flickr = flickrapi.FlickrAPI(api_key=settings.FLICKR_KEY, secret=settings.FLICKR_SECRET, token = token)
-        result = flickr.photos_search(user_id=flickr_user, max_taken_date=self.end_time + offset_td, min_taken_date=self.start_time + offset_td, extras='date_taken')
-                            
+
+        result = self.get_flickr_between(self.start_time, self.end_time, offset_minutes)
         geophotos = []
         
         if int(result.photos[0]["total"]) > 0:
