@@ -83,6 +83,10 @@ mytracks.net - plan your route
 	    route[marker_number_here] = marker_here;
 		getRouteLength(route);		
 		return marker_here;
+		alert(mapviewer);
+	if (polyline) polyline.remove();
+    polyline = new MMPolyLineOverlay( route, color, opacity, thickness,  closed, fill );
+    mapviewer.addOverlay(polyline);
 	    
 	}
 
