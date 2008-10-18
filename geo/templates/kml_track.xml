@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>{{track.name}}</name>
+    <description>
+        <![CDATA[
+<p><strong>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</strong></p>
+<p>{{track.description}}</p>
+<table class="stats">
+    <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
+    <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
+</table>
+        ]]>
+	
+	</description>
+    <Style id="yellowLine">
+      <LineStyle>
+        <color>7f00ffff</color>
+        <width>2</width>
+      </LineStyle>
+    </Style>
+    <Placemark>
+      <name>{{track.name}}</name>
+      <description>
+        <![CDATA[
+<p><strong>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</strong></p>
+<p>{{track.description}}</p>
+<table class="stats">
+    <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
+    <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Descent</th><td> {{track.descent|floatformat:2}}m</td></tr>
+    <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
+    <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
+</table>
+        ]]>      	
+      </description>
+      <styleUrl>#yellowLine</styleUrl>
+      <LineString>
+        <extrude>1</extrude>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates> 
+    	{% for wp in track.gps_points %}
+	       	{{wp.longitude|floatformat:9}},{{wp.latitude|floatformat:9}},{{wp.altitude|floatformat:2}} 
+        {% endfor %}
+		 
+        </coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>

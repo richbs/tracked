@@ -241,18 +241,26 @@ class GpxFile(models.Model):
     def save(self):
 
         super(GpxFile, self).save() # Call the "real" save() method
-        
+        # create a trip to store the tracks
+
         if self.track_set.count() < 1:
             # assert False, [ self.waypoints.count(), self.id, self.name, self.description, self.track_set]
             self.process_xml()
             self.create_tracks()
-
-
+            trip = Trip()
+            trip.name = self.name
+            wp_count = self.waypoints.count()
+            trip.start_time = self.waypoints.all()[0].gmtime
+            trip.end_time = self.waypoints.all()[wp_count-1].gmtime
+            trip.save()
+            for t in self.track_set.all():
+                trip.tracks.add(t)
+            trip.save()
 
 class Track(models.Model):
     """(Track description)"""
     def __unicode__(self):
-        return "%s %s-%s" % (self.name, self.start_time.strftime('%Y-%m-%d %H:%M:%S'), self.end_time.strftime('%H:%M:%S') )
+        return "%s (%s-%s)" % (self.name, self.start_time.strftime('%Y-%m-%d %H:%M'), self.end_time.strftime('%H:%M') )
 
     name        = models.CharField( max_length=100,db_index=True)
     description = models.CharField(blank=True, max_length=255)
@@ -436,8 +444,13 @@ class Trip(models.Model):
     end_time    = models.DateTimeField(db_index=True)
     length = models.DecimalField(max_digits=10, decimal_places=5)
     tracks = models.ManyToManyField(Track)
-    
-
-
+    def save(self):
+        self.length = 0
+        
+        
+        for tr in self.tracks.all():
+            print tr.length
+            self.length += tr.length
+        super(Trip, self).save() # Call the "real" save() method
 
     

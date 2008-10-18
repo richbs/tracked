@@ -18,8 +18,17 @@
     <tr><th scope="row">High Point</th><td> {{track.altitude_max|floatformat:2}}m</td></tr>
     <tr><th scope="row">Low Point</th><td> {{track.altitude_min|floatformat:2}}m</td></tr> 
 </table>
-<h2>{{track.gpx_file.name}}</h2>
-<h3>Other tracks from this file</h3>
+<h2>Viewing Options</h2>
+<ul>
+<li><a href="/track/{{track.id}}">Google Map</a></li>
+<li><a href="/track/{{track.id}}.kml">Google Earth</a></li>
+<li><a href="/os-track/{{track.id}}">Ordnance Survey</a></li>
+</ul>
+<form action="/geotag" method="post">
+<input type="hidden" name="track_id" value="{{track.id}}" />
+<input type="submit" name="subit-geotag" value="Geo Tag Images in Flickr"/>
+</form>
+<h2>Other tracks from {{track.gpx_file.name}}</h2>
 <ul id="tracks">
 {%for t in track.gpx_file.track_set.all %}
 <li>
@@ -28,16 +37,11 @@
 		<img src="{{MEDIA_URL}}/img/XML.png" alt="XML Icon" />
 	</a>
 -->
-{{t.start_time|date:"Y-m-d D H:i"}}
-<a href="/track/{{t.id}}">Google</a>
-<a href="/os-track/{{t.id}}">OS</a>
+<a href="/track/{{t.id}}">{{t.start_time|date:"Y-m-d D H:i"}}</a>
  [{{t.length|floatformat:2}}M]
 </li>
 {%endfor%}
 </ul>
-<form action="/geotag" method="post">
-<input type="hidden" name="track_id" value="{{track.id}}" />
-<input type="submit" name="subit-geotag" value="Geo Tag Images in Flickr"/>
-</form>
+
 {% endblock %}
 

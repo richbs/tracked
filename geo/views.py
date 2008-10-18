@@ -162,7 +162,11 @@ def get_photos(request, track_id):
     #gpxfile = track.gpx_file
     #assert False, track.random_photos()
     return render_to_response('track.html', {'track':track},context_instance=RequestContext(request))
-  
+
+def kml_track(request, track_id):
+    track = Track.objects.select_related().get(id=track_id)
+    return render_to_response('kml_track.xml', {'track':track},context_instance=RequestContext(request))
+
 def show_track(request, track_id):
     
     track = Track.objects.select_related().get(id=track_id)

@@ -334,6 +334,18 @@ ul#works li a {
 }
 
 
+ul {
+    font-size:90%;
+    font-family:monospace;
+    margin:0 0 0 20px;
+    padding:0 0 0 0;
+}
+ul li {
+    margin: 0 0 4px 0;
+    list-style: disc;
+    
+}
+
 /* GPS track listing */
 ul#tracks {
     font-size:90%;
