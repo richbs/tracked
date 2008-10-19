@@ -450,7 +450,7 @@ class Trip(models.Model):
     tracks = models.ManyToManyField(Track)
     def save(self):
         self.length = 0
-        
+        super(Trip, self).save() # Call the "real" save() method
         count = 0
         for tr in self.tracks.all():
             if count == 0:
