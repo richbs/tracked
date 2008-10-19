@@ -38,11 +38,16 @@ class WayPointAdmin(admin.ModelAdmin):
 admin.site.register(WayPoint, WayPointAdmin)
 
 class TrackAdmin(admin.ModelAdmin):
-    pass
-
+    
+    date_hierarchy = 'start_time'
+    list_display = ('name', 'start_time','length',)
+    ordering = ['-start_time',]
 admin.site.register(Track, TrackAdmin)
 
 class TripAdmin(admin.ModelAdmin):
-    pass
-
+    
+    date_hierarchy = 'start_time'
+    filter_horizontal = ('tracks',)
+    list_display = ('name', 'start_time','length',)
+    ordering = ['-start_time',]
 admin.site.register(Trip, TripAdmin)

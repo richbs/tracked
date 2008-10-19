@@ -16,10 +16,10 @@
         ]]>
 	
 	</description>
-    <Style id="yellowLine">
+    <Style id="blueLine">
       <LineStyle>
-        <color>7f00ffff</color>
-        <width>2</width>
+        <color>7fff0000</color>
+        <width>4</width>
       </LineStyle>
     </Style>
     <Placemark>
@@ -37,7 +37,7 @@
 </table>
         ]]>      	
       </description>
-      <styleUrl>#yellowLine</styleUrl>
+      <styleUrl>#blueLine</styleUrl>
       <LineString>
         <extrude>1</extrude>
         <tessellate>1</tessellate>

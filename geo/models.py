@@ -260,7 +260,7 @@ class GpxFile(models.Model):
 class Track(models.Model):
     """(Track description)"""
     def __unicode__(self):
-        return "%s (%s-%s)" % (self.name, self.start_time.strftime('%Y-%m-%d %H:%M'), self.end_time.strftime('%H:%M') )
+        return "%s (%0.2fm) [%s]" % (self.name, self.length, self.start_time.strftime('%Y-%m-%d %H:%M') )
 
     name        = models.CharField( max_length=100,db_index=True)
     description = models.CharField(blank=True, max_length=255)
@@ -274,7 +274,11 @@ class Track(models.Model):
     waypoints   = models.ManyToManyField(WayPoint,editable=False)
     gpx_file = models.ForeignKey(GpxFile)
     _offset_timedelta = timedelta(seconds=0)
-    
+    def first_trip(self):
+        try:
+            return self.trip_set.all()[0]
+        except IndexError:
+            return False
     def waypoints_ordered(self):
         """all waypoints for this track in order by time"""
         return self.waypoints.select_related().order_by('localtime')
@@ -435,7 +439,7 @@ class Track(models.Model):
 
 class Trip(models.Model):
     def __unicode__(self):
-        return "Trip"
+        return "%s" % (self.name)
         
     """(Trip description)"""
     name        = models.CharField( max_length=100)
@@ -447,8 +451,11 @@ class Trip(models.Model):
     def save(self):
         self.length = 0
         
-        
+        count = 0
         for tr in self.tracks.all():
+            if count == 0:
+                self.start_time = tr.start_time
+            self.end_time = tr.end_time
             print tr.length
             self.length += tr.length
         super(Trip, self).save() # Call the "real" save() method

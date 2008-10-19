@@ -47,12 +47,14 @@ body {
 
 #info {
 	background-color: #FFFFFF;
-    width: 220px;
-    padding:0 5px 0 5px;
+    width: 230px;
+    padding:0 0 0 0;
     margin: 0 0 0 0 ;
     position:absolute;
     right:0;
     top:0;
+	overflow-y:scroll;
+	overflow-x:hidden;
 }
 #map {
     text-align: center;
@@ -113,21 +115,36 @@ h1 {
 
 h2 {
     font-size: 130%;
+	line-height:140%;
     padding:0px 0 0px 0;
-    margin:5px 0 5px 5px;    
+    margin:5px 0 5px 5px;
+	color:#900; 
 }
 h3 {
-    color: #666;
-    font-size: 110%;    
-    line-height:120%;
+    
+	font-weight:bold;
+    font-size: 120%;    
+    line-height:130%;
     padding:0px 0 0px 0;
-    margin:0px 0 5px 10px;    
+    margin:10px 0 5px 5px;
+	color:#090;  
+}
+h4 {
+	color:#0000CC;
 }
 
 p {
     line-height:140%;
+	margin: 0 5px 0 5px;
 }
 
+strong {
+	font-weight:bold;
+
+}
+em {
+	font-style:italic;
+}
 
 
 fieldset {
@@ -194,9 +211,7 @@ input.textbox {
     background: #feb;
     border: #26a solid 1px;
 }
-p {
-    margin: 0 10px 0 10px;
-}
+
 p.waffle {
     font-size: small;
     color: #666;
@@ -348,13 +363,13 @@ ul li {
 
 /* GPS track listing */
 ul#tracks {
-    font-size:90%;
+    font-size:100%;
     font-family:monospace;
-    margin:0 0 0 20px;
+    margin:0 0 0 0px;
     padding:0 0 0 0;
 }
 ul#tracks li {
-    margin: 0 0 4px 0;
+    margin: 0 0 4px 5px;
     list-style: none;
     
 }
@@ -362,4 +377,10 @@ ul#tracks li {
 ul#tracks li h4 {
     display: inline;
 }
+ul#tracks li h4 {
+    line-height: 140%;
+}
 
+p.stats {
+	text-align:right;
+}

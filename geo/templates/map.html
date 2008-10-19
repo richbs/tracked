@@ -11,6 +11,7 @@
 <div id="map"></div>
 <div id="info">
 <h1>{{track.start_time|date:"D M jS H:i"}}-{{track.end_time|date:"H:i"}}</h1>
+<h2>Track Stats</h2>
 <table class="stats">
     <tr><th scope="row">Length</th><td> {{track.length|floatformat:2}}M</td></tr>
     <tr><th scope="row">Ascent</th><td> {{track.ascent|floatformat:2}}m</td></tr>
@@ -24,21 +25,26 @@
 <li><a href="/track/{{track.id}}.kml">Google Earth</a></li>
 <li><a href="/os-track/{{track.id}}">Ordnance Survey</a></li>
 </ul>
+<!--
 <form action="/geotag" method="post">
 <input type="hidden" name="track_id" value="{{track.id}}" />
 <input type="submit" name="subit-geotag" value="Geo Tag Images in Flickr"/>
 </form>
-<h2>Other tracks from {{track.gpx_file.name}}</h2>
+-->
+<h2>Trip: {{track.first_trip.name}}</h2>
+<p class="stats"><em>{{track.first_trip.start_time|date:"Y-m-d"}} thru {{track.first_trip.end_time|date:"Y-m-d"}}</em></p>
+<p class="stats"><strong>Total Distance:</strong> {{track.first_trip.length|floatformat:0}} miles</p>
+<h3>Other Tracks</h3>
 <ul id="tracks">
-{%for t in track.gpx_file.track_set.all %}
+{%for t in track.first_trip.tracks.all %}
 <li>
 	<!--
 	<a href="/gps/dates/20071001-20071231/1/xml" title="Download the GPX version of this track">
 		<img src="{{MEDIA_URL}}/img/XML.png" alt="XML Icon" />
 	</a>
 -->
-<a href="/track/{{t.id}}">{{t.start_time|date:"Y-m-d D H:i"}}</a>
- [{{t.length|floatformat:2}}M]
+<h4><a href="/track/{{t.id}}">{{t.name}}</a> ({{t.length|floatformat:2}} miles)</h4>
+<p class="stats">{{t.start_time|date:"Y-m-d D H:i"}}</p>
 </li>
 {%endfor%}
 </ul>
