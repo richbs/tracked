@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
 from tracked import settings
 from django.contrib import admin
+from django.conf import settings
 
 admin.autodiscover()
 
@@ -24,5 +25,5 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-             (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Users/barrettsmall/Sites/tracked/media/', 'show_indexes': True}),
+             (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     )

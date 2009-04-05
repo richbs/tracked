@@ -11,33 +11,30 @@ import flickrapi
 
 #gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
 #gpx_file_name = FilenameMatchesRegularExpression('^[^ ]{3,80}\.gpx$', 'Filename must end in GPX')
-    
-class WayPoint(models.Model):
-    """A point in space and time
-    
-    Need to normalise Flickr info when QuerySet refactor is merged into trunk
-    So select related will be more accessible
-    """
-    latitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
-    longitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
-    altitude = models.DecimalField(max_digits=12, decimal_places=7, db_index=True)
-    localtime = models.DateTimeField(db_index=True)
-    gmtime = models.DateTimeField(db_index=True)
-    
-    # Need to normalise this into flickrphoto model after queryset refactor
-    photo_id = models.CharField(max_length=12,null=True)
-    photo_title = models.CharField(max_length=256,null=True)
-    photo_description = models.CharField(max_length=2000,null=True)
-    photo_secret = models.CharField(max_length=10,null=True)
-    photo_farm = models.PositiveSmallIntegerField(max_length=1,null=True)
-    photo_server = models.PositiveSmallIntegerField(max_length=3,null=True)
-    
-    class Admin:
-        pass
 
+class Trip(models.Model):
     def __unicode__(self):
-        return "%s %sm" % (  self.gmtime.strftime('%Y-%m-%d %H:%M:%S'), str(self.altitude) )
+        return "%s" % (self.name)
         
+    """(Trip description)"""
+    name        = models.CharField( max_length=100)
+    description = models.CharField(blank=True, max_length=255)
+    start_time  = models.DateTimeField(db_index=True)
+    end_time    = models.DateTimeField(db_index=True)
+    length = models.DecimalField(max_digits=10, decimal_places=5)
+    
+    def save(self):
+        self.length = 0
+        super(Trip, self).save() # Call the "real" save() method
+        count = 0
+        for tr in self.tracks.all():
+            if count == 0:
+                self.start_time = tr.start_time
+            self.end_time = tr.end_time
+            
+            self.length += tr.length
+        super(Trip, self).save() # Call the "real" save() method
+
 class GpxFile(models.Model):
     """Details of the uploaded XML file
 
@@ -47,12 +44,9 @@ class GpxFile(models.Model):
     def __unicode__(self):
         return "%s %s" % ( self.name, self.filename )
 
-
-
     name        = models.CharField( max_length=100)
     description = models.CharField(blank=True, max_length=255)
     filename    = models.FileField(upload_to='xml',blank=True)
-    waypoints   = models.ManyToManyField(WayPoint,blank=True,editable=False)
 
     def create_tracks(self, min_interval=30, max_interval=2700, min_length=0.1):
         """
@@ -83,6 +77,7 @@ class GpxFile(models.Model):
 
         else:
             track = Track()
+            
         track.name="%s %d" % ( self.name, track_count)
         track.description   = ''
         track.length        = 0
@@ -123,16 +118,25 @@ class GpxFile(models.Model):
                         self.track_set.add(track)
                                                
                         # Normalise altitude of first waypoint
-                        w1 = track.waypoints.all().order_by('gmtime')[0]
-                        w2 = track.waypoints.all().order_by('gmtime')[1]
-                        w1.altitude = w2.altitude
-                        w1.save()
-
-                        # Normalise altitude of last waypoint
-                        w1 = track.waypoints.all().order_by('-gmtime')[0]
-                        w2 = track.waypoints.all().order_by('-gmtime')[1]
-                        w1.altitude = w2.altitude
-                        w1.save()
+#                        w1 = track.waypoints.all().order_by('gmtime')[0]
+#                        w2 = track.waypoints.all().order_by('gmtime')[1]
+#                        w1.altitude = w2.altitude
+#                        if w1.gmtime == w2.gmtime and w1.latitude == w2.latitude and w1.longitude == w2.latitude:
+#                            w1.delete()
+#                            w2.save()
+#                        else:
+#                            print w1.id, w1.latitude,w1.longitude,w1.gmtime,w1.altitude
+#                            w1.save()
+#
+#                        # Normalise altitude of last waypoint
+#                        w1 = track.waypoints.all().order_by('-gmtime')[0]
+#                        w2 = track.waypoints.all().order_by('-gmtime')[1]
+#                        w1.altitude = w2.altitude
+#                        if w1.gmtime == w2.gmtime and w1.latitude == w2.latitude and w1.longitude == w2.latitude:
+#                            w1.delete()
+#                            w2.save()
+#                        else:
+#                            w1.save()                        
                         
                         track.update_data()                                     
 
@@ -173,6 +177,7 @@ class GpxFile(models.Model):
                 #elif too_short:
                 #    previous = previous
                 else:
+                    
                     length += get_distance(previous,wp)
                     track.waypoints.add(wp)
                     previous = wp
@@ -222,12 +227,11 @@ class GpxFile(models.Model):
                     #assert False, timeob2
                     # Try get or create here
                     try:       
-                        w, created = WayPoint.objects.get_or_create(latitude=lat,longitude=lon,altitude=elestring,gmtime=timeob,localtime=localtime)
+                        w, created = WayPoint.objects.get_or_create(latitude=lat,longitude=lon,altitude=elestring,gmtime=timeob,localtime=localtime,)
                         #w = WayPoint(latitude=lat,longitude=lon,altitude=elestring,gmtime=timeob,localtime=localtime)
-                        #w.save()
-                        w.gpxfile_set.add(self)
-                        del(w)
-                    #self.waypoints.add(w)                        
+                        w.gpx_file = self
+                        w.save()
+                                                                  
                     except ValueError:
                         assert False, node.toxml()
 
@@ -260,7 +264,7 @@ class GpxFile(models.Model):
 class Track(models.Model):
     """(Track description)"""
     def __unicode__(self):
-        return "%s (%0.2fm) [%s]" % (self.name, self.length, self.start_time.strftime('%Y-%m-%d %H:%M') )
+        return "%s (%0.2fm) [%s]" % (self.name, float(self.length), self.start_time.strftime('%Y-%m-%d %H:%M') )
 
     name        = models.CharField( max_length=100,db_index=True)
     description = models.CharField(blank=True, max_length=255)
@@ -271,8 +275,8 @@ class Track(models.Model):
     descent = models.DecimalField(max_digits=10, decimal_places=5)
     altitude_max = models.DecimalField(max_digits=10, decimal_places=5)
     altitude_min = models.DecimalField(max_digits=10, decimal_places=5)
-    waypoints   = models.ManyToManyField(WayPoint,editable=False)
     gpx_file = models.ForeignKey(GpxFile)
+    trip = models.ForeignKey(Trip, related_name="tracks",null=True)
     _offset_timedelta = timedelta(seconds=0)
     def first_trip(self):
         try:
@@ -293,7 +297,8 @@ class Track(models.Model):
     
     def gps_points(self):
         """Waypoints with no photo"""
-        return self.waypoints.filter(photo_id__isnull=True).order_by('localtime')
+        return self.waypoints.all().order_by('localtime')
+        #return self.waypoints.filter(photo_id__isnull=True).order_by('localtime')
     
     def geotag_photo(self, xml_photo):
         """find the location of this photo using existing waypoints"""
@@ -421,11 +426,11 @@ class Track(models.Model):
                 # Check if we have a new low
                 if wp.altitude < altitude_min:
                     altitude_min = wp.altitude
-            
+                
                 length += get_distance(previous,wp)
                 # make this waypoint the previous one
                 previous = wp
-        print  'um'
+        
         # Create track here
         self.length    = str(round(length,5))
         self.ascent    = str(round(ascent,5))
@@ -433,31 +438,48 @@ class Track(models.Model):
         self.altitude_max = str(round(altitude_max,5))
         self.altitude_min = str(round(altitude_min,5))
         self.end_time  = previous.localtime
-        self.save()
-        #self.get_photos()
-
-
-class Trip(models.Model):
-    def __unicode__(self):
-        return "%s" % (self.name)
         
-    """(Trip description)"""
-    name        = models.CharField( max_length=100)
-    description = models.CharField(blank=True, max_length=255)
-    start_time  = models.DateTimeField(db_index=True)
-    end_time    = models.DateTimeField(db_index=True)
-    length = models.DecimalField(max_digits=10, decimal_places=5)
-    tracks = models.ManyToManyField(Track)
+        #self.get_photos()
+        
     def save(self):
-        self.length = 0
-        super(Trip, self).save() # Call the "real" save() method
-        count = 0
-        for tr in self.tracks.all():
-            if count == 0:
-                self.start_time = tr.start_time
-            self.end_time = tr.end_time
-            print tr.length
-            self.length += tr.length
-        super(Trip, self).save() # Call the "real" save() method
+        
+        self.update_data()
+        super(Track, self).save() # Call the "real" save() method
+
+
+class WayPoint(models.Model):
+    """A point in space and time
+    
+    Need to normalise Flickr info when QuerySet refactor is merged into trunk
+    So select related will be more accessible
+    """
+    class Meta:
+        
+        unique_together = (("latitude", "longitude","altitude","localtime"),)
 
     
+    latitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
+    longitude = models.DecimalField(max_digits=12, decimal_places=9, db_index=True)
+    altitude = models.DecimalField(max_digits=12, decimal_places=7, db_index=True)
+    localtime = models.DateTimeField(db_index=True)
+    gmtime = models.DateTimeField(db_index=True)
+    track = models.ForeignKey(Track, related_name="waypoints",null=True )
+    gpx_file = models.ForeignKey(GpxFile, related_name="waypoints",null=True )
+    
+
+    
+    #TODO Need to normalise this into flickrphoto model after queryset refactor
+#    photo_id = models.CharField(max_length=12,null=True)
+#    photo_title = models.CharField(max_length=256,null=True)
+#    photo_description = models.CharField(max_length=2000,null=True)
+#    photo_secret = models.CharField(max_length=10,null=True)
+#    photo_farm = models.PositiveSmallIntegerField(max_length=1,null=True)
+#    photo_server = models.PositiveSmallIntegerField(max_length=3,null=True)
+    
+    class Admin:
+        pass
+
+    def __unicode__(self):
+        return "%s %sm" % (  self.gmtime.strftime('%Y-%m-%d %H:%M:%S'), str(self.altitude), )
+        
+
