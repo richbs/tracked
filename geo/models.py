@@ -442,7 +442,7 @@ class Track(models.Model):
         #self.get_photos()
         
     def save(self):
-        
+
         self.update_data()
         super(Track, self).save() # Call the "real" save() method
 
