@@ -219,7 +219,7 @@ class GpxFile(models.Model):
                     try:
                         timeob = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ')
                     except ValueError:
-                        timeob = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%S.000Z')
+                        timeob = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%S.%fZ')
                     timeob2 = timeob.replace(tzinfo=UTC)
                     timo = time.mktime(timeob2.timetuple())
                     tupelo = time.localtime(timo)
