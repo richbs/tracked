@@ -2,66 +2,67 @@
 
 {% block head_tags %}
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/css/jquery.lightbox.css" media="screen" />
- 
-  <script type="text/javascript"
-  src="http://developer.multimap.com/API/maps/1.2/OA08061915958153873"></script>
+
+
+<script type="text/javascript" 
+    src="http://openspace.ordnancesurvey.co.uk/osmapapi/openspace.js?key=50A60597FF6FA670E0405F0AF0607DE0"></script>  
 <script type="text/javascript" charset="utf-8" src="{{MEDIA_URL}}/js/PolylineEncoder.js"></script>
 <script type="text/javascript" src="{{MEDIA_URL}}/js/jquery.js"></script>
-
-
 <script type="text/javascript">
-
-
-    
-    
-    var d = new Date();
     //<![CDATA[
-    var starttime = d.getTime();
-    var report =  'starting:' + d.getTime();
-    
     $(window).resize(function(){
-    
         $('#map').height($(this).height() - 5);
     });
 
     $('#map').ready( function() {
-
-        /* Bind event 
-        $('#map').click(function(e){
-            alert(e.target);
-        });
-        */  
-        var d = new Date();
-        report += 'domready:' + (d.getTime() - starttime ); 
         $('#map').height( $(window).height() - 5 );
-            	  //Add the map
-  var mapviewer = new MMFactory.createViewer( document.getElementById( 'map' ) );
-  mapviewer.goToPosition( new MMLatLon( 52.2, 0.14 ) );
-	MMDataResolver.setDataPreferences(MM_WORLD_MAP, [904]);
-	mapviewer.addWidget(new MMSmallPanZoomWidget());
-	mapviewer.setAllowedZoomFactors(13, 15);
+        
+        // Add the map
+        var osMap = new OpenSpace.Map('map');
+        
+        // Need projection for lat lons
+        var grid_projection = new OpenSpace.GridProjection();
+
+        // create bounds object to set zoom level to fit all datapoints
+        var bounds = new OpenLayers.Bounds();       
+        
+        // set up 
+        
+        //	mapviewer.addWidget(new MMSmallPanZoomWidget());
+        //	mapviewer.setAllowedZoomFactors(13, 15);
 	
-	        // and for the track route to build polyline
+        // and for the track route to build polyline
         var track_latlons = new Array();
+        
         var track_photos = new Array();
         {% for wp in track.gps_points %}
-                track_latlons.push( new MMLatLon( {{wp.latitude|floatformat:9}}, {{wp.longitude|floatformat:9}} ) );
+            lon_lat = new OpenLayers.LonLat( {{wp.longitude|floatformat:9}}, {{wp.latitude|floatformat:9}} );
+            // Loop through photo co-ords to set map bounds
+            bounds.extend(lon_lat)
+            pos = grid_projection.getMapPointFromLonLat(lon_lat);
+            point = new OpenLayers.Geometry.Point(pos.lon, pos.lat);
+            track_latlons.push(point)
         {% endfor %}
-    	
-    	//create bounds object to set zoom level to fit all datapoints
-        var bounds = new MMBounds();
-
-        // Loop through photo co-ords to set map bounds
-        for (i = 0; i < track_latlons.length; i++ ) {
-                bounds.extend(track_latlons[i]);            
-        }
         
-        var loca = mapviewer.getAutoScaleLocation(track_latlons);    	
-    	
-    	polyline = new MMPolyLineOverlay( track_latlons, '#00F', 2, 0.5, false, false );
-    	mapviewer.addOverlay(polyline);
-    	mapviewer.drawAndPositionMap(loca);
-	    })
+
+        console.log(bounds);
+        map_center = bounds.getCenterLonLat();
+        zoom = osMap.getZoomForExtent(bounds);
+        // Start at 25000:1
+        osMap.setCenter(grid_projection.getMapPointFromLonLat(map_center), 7);
+
+    // Initialise our vector layer variable 
+    var vectorLayer = osMap.getVectorLayer();
+    
+    // Define the line style 
+    var style = {strokeColor: "#0000FF", strokeOpacity: 0.75, strokeWidth: 4}; 
+    vectorLayer.styleMap = new OpenLayers.StyleMap( style );
+    
+    // Create a polyline feature from the array of points 
+    var lineString = new OpenLayers.Geometry.LineString(track_latlons); 
+    var lineFeature = new OpenLayers.Feature.Vector(lineString); 
+    vectorLayer.addFeatures([lineFeature]); 
+});
 
     //]]>
 

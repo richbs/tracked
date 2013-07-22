@@ -59,6 +59,8 @@ body {
 #map {
     text-align: center;
     background-color: #000;
+	position:relative;
+	width:auto;
     height: 500px;
     margin: 0 235px 0 0;
 }
