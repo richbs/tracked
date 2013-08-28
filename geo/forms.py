@@ -1,29 +1,30 @@
+import datetime
 from django import forms
-from tracked.settings import MEDIA_ROOT
-from tracked.geo.models import GpxFile
+from django.conf import settings
 from django.forms.extras import SelectDateWidget
+from geo.models import GpxFile
 
-import os
+SELECT_YEARS = range(2006, datetime.date.today().year + 1)
 
-SELECT_YEARS = (2006,2007,2008,2009)
+print SELECT_YEARS
 
 class DateSearch(forms.Form):
     from_date = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))
-    to_date   = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))
+    to_date = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))
 
 
 class UploadFormTwo(forms.ModelForm):
     class Meta:
         model = GpxFile
-        fields = ('name','description','filename')
-    
+        fields = ('name', 'description', 'filename')
+
     def clean_filename(self):
 
         if 'filename' in self.cleaned_data:
             filename = self.cleaned_data['filename']
-            #assert False, len(filename.get('content'))
-            #assert False, len(filename.content)
-            
+            # assert False, len(filename.get('content'))
+            # assert False, len(filename.content)
+
             if not filename.filename.endswith('.gpx'):
                 msg = 'Only .gpx XML files are allowed.'
                 raise forms.ValidationError(msg)
@@ -32,17 +33,18 @@ class UploadFormTwo(forms.ModelForm):
                 raise forms.ValidationError(msg)
             return filename
 
+
 class UploadForm(forms.Form):
     name = forms.CharField()
     description = forms.CharField()
-    filename = forms.Field( 
-        widget = forms.FileInput(attrs={'class': 'fun'})
+    filename = forms.Field(
+        widget=forms.FileInput(attrs={'class': 'fun'})
     )
     """
     def save(self):
         xml_data = self.clean_data['filename']['content']
         xml_filename = self.clean_data['filename']['filename']
-        f = open(MEDIA_ROOT + '/xml/' + xml_filename, 'w')
+        f = open(settings.MEDIA_ROOT + '/xml/' + xml_filename, 'w')
         f.write(xml_data)
         f.close()
         # create GPX file object

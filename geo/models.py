@@ -194,13 +194,12 @@ class GpxFile(models.Model):
         else:
             track.delete()
 
-    def process_xml(self):
+    @staticmethod
+    def process_gpx_file(filename, gpx_file_object=None):
         """
-        Convert XML points to WayPoint nodes
+        Create waypoints from GPX nodes from given file
         """
-        print 'processing xml'
-        file_name = str(self.filename)
-        gpxlog = pulldom.parse(os.path.join(settings.MEDIA_ROOT, file_name))
+        gpxlog = pulldom.parse(os.path.join(settings.MEDIA_ROOT, filename))
 
         for event, node in gpxlog:
             # Only construct a dom from the track points
@@ -230,7 +229,8 @@ class GpxFile(models.Model):
                     try:
                         w, created = WayPoint.objects.get_or_create(latitude=lat, longitude=lon, altitude=elestring, gmtime=timeob, localtime=localtime,)
                         # w = WayPoint(latitude=lat,longitude=lon,altitude=elestring,gmtime=timeob,localtime=localtime)
-                        w.gpx_file = self
+                        if gpx_file_object:
+                            w.gpx_file = gpx_file_object
                         w.save()
 
                     except ValueError:
@@ -242,6 +242,13 @@ class GpxFile(models.Model):
             del(node)
 
         del(gpxlog)
+
+    def process_xml(self):
+        """
+        Wrap GPX file processing method
+        """
+        self.process_gpx_file(str(self.filename), self)
+
 
     def save(self):
 

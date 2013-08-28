@@ -1,23 +1,25 @@
 import math
 from django.utils.tzinfo import FixedOffset
 from geopy.distance import GreatCircleDistance as Distance
-#from geopy.distance import VincentyDistance as Distance
+# from geopy.distance import VincentyDistance as Distance
 
 UTC = FixedOffset(0)
 
-def get_distance( wp1, wp2):
+
+def get_distance(wp1, wp2):
     # TODO: fix math error
-    print wp1.latitude,wp1.longitude,wp2.latitude,wp2.longitude
+    print wp1.latitude, wp1.longitude, wp2.latitude, wp2.longitude
     if wp1.latitude == wp2.latitude and wp2.longitude == wp2.longitude:
         # Distance equation doesn't work when distance is zero
-        
+
         return 0
     else:
-        return Distance((wp1.latitude, wp1.longitude,),(wp2.latitude,wp2.longitude,)).miles
-    
- 
+        return Distance((wp1.latitude, wp1.longitude,),
+                        (wp2.latitude, wp2.longitude,)).miles
 
-#def get_distance( wp1, wp2):
+
+
+# def get_distance( wp1, wp2):
 #    '''Returns the distance between two points on the earth.
 #
 #    Inputs used are:
@@ -25,7 +27,7 @@ def get_distance( wp1, wp2):
 #        Latitude (in radians) of the first location,
 #        Longitude (in radians) of the second location, and
 #        Latitude (in radians) of the second location.
-#    To convert to radians (from degrees), use pythons math.radian function (Note: already done 
+#    To convert to radians (from degrees), use pythons math.radian function (Note: already done
 #    for you in the constructor above).  Returns the distance in miles.'''
 #
 #    long_1 = math.radians(float(wp1.longitude))
