@@ -1,16 +1,12 @@
-from django.db import models
-from xml.dom import pulldom
 from datetime import datetime, timedelta
-import time, os
-from tracked.geo.helpers import get_distance, UTC
-# from tracked.geo.validators import FilenameMatchesRegularExpression, HasAllowableSize
-
-from django.conf import settings
-
+import os
+import time
 import flickrapi
+from xml.dom import pulldom
+from django.conf import settings
+from django.db import models
+from geo.helpers import get_distance, UTC
 
-# gpx_file_size = HasAllowableSize(min_size=10, max_size=1573000)
-# gpx_file_name = FilenameMatchesRegularExpression('^[^ ]{3,80}\.gpx$', 'Filename must end in GPX')
 
 class Trip(models.Model):
     def __unicode__(self):
@@ -35,11 +31,12 @@ class Trip(models.Model):
             self.length += tr.length
         super(Trip, self).save()  # Call the "real" save() method
 
+
 class GpxFile(models.Model):
     """Details of the uploaded XML file
 
     Linked to some waypoints and some tracks
-    
+
     """
     def __unicode__(self):
         return "%s %s" % (self.name, self.filename)
@@ -52,7 +49,7 @@ class GpxFile(models.Model):
         """
         min_interval    = 60
         max_interval    = 3500
-        min_length      = 1        
+        min_length      = 1
         """
         print 'creating tracks'
         # Our waypoints for this jaunt
@@ -194,8 +191,7 @@ class GpxFile(models.Model):
         else:
             track.delete()
 
-    @staticmethod
-    def process_gpx_file(filename, gpx_file_object=None):
+    def process_gpx_file(self, filename):
         """
         Create waypoints from GPX nodes from given file
         """
@@ -229,8 +225,7 @@ class GpxFile(models.Model):
                     try:
                         w, created = WayPoint.objects.get_or_create(latitude=lat, longitude=lon, altitude=elestring, gmtime=timeob, localtime=localtime,)
                         # w = WayPoint(latitude=lat,longitude=lon,altitude=elestring,gmtime=timeob,localtime=localtime)
-                        if gpx_file_object:
-                            w.gpx_file = gpx_file_object
+                        w.gpx_file = self
                         w.save()
 
                     except ValueError:
@@ -457,7 +452,7 @@ class Track(models.Model):
 
 class WayPoint(models.Model):
     """A point in space and time
-    
+
     Need to normalise Flickr info when QuerySet refactor is merged into trunk
     So select related will be more accessible
     """
