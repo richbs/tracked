@@ -1,55 +1,55 @@
-        
+
 from django.contrib import admin
 from django import forms
-from tracked.geo.models import GpxFile, Track, WayPoint, Trip
+from geo.models import GpxFile, Track, WayPoint, Trip
 
 
 class GpxFileAdminForm(forms.ModelForm):
     class Meta:
         model = GpxFile
-    
+
     def clean_filename(self):
         if self.cleaned_data['filename']:
             if not self.cleaned_data['filename'].name.endswith('.gpx'):
                 raise forms.ValidationError('filename must end with .gpx')
-            
+
             if self.cleaned_data['filename'].size > 1300000:
                 raise forms.ValidationError('%s is too large.' % self.cleaned_data['filename'])
-            
+
             return self.cleaned_data['filename']
-        
+
 
 
 class GpxFileAdmin(admin.ModelAdmin):
-    
+
     form = GpxFileAdminForm
-    
+
     fieldsets = (
         (None, {
-            'fields':('name','description','filename')
+            'fields':('name', 'description', 'filename')
         }),
     )
-    
+
 admin.site.register(GpxFile, GpxFileAdmin)
 
 class WayPointInline(admin.TabularInline):
     model = WayPoint
 class WayPointAdmin(admin.ModelAdmin):
-    
+
     pass
 
 admin.site.register(WayPoint, WayPointAdmin)
 
 class TrackAdmin(admin.ModelAdmin):
-    inlines = [WayPointInline,]
+    inlines = [WayPointInline, ]
     date_hierarchy = 'start_time'
-    list_display = ('name', 'start_time','length',)
-    ordering = ['-start_time',]
+    list_display = ('name', 'start_time', 'length',)
+    ordering = ['-start_time', ]
 admin.site.register(Track, TrackAdmin)
 
 class TripAdmin(admin.ModelAdmin):
-    
+
     date_hierarchy = 'start_time'
-    list_display = ('name', 'start_time','length',)
-    ordering = ['-start_time',]
+    list_display = ('name', 'start_time', 'length',)
+    ordering = ['-start_time', ]
 admin.site.register(Trip, TripAdmin)

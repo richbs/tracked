@@ -1,6 +1,6 @@
 # Django settings for tracked2 project.
 
-DEBUG = False 
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 import os
@@ -77,7 +77,7 @@ TEMPLATE_DIRS = (
     '/Users/richbs/Sites/tracked/geo/templates/'
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = ('tracked.geo.context_processors.gmap_key_processor',
+TEMPLATE_CONTEXT_PROCESSORS = ('geo.context_processors.gmap_key_processor',
                                'django.core.context_processors.auth',
                                'django.core.context_processors.media',)
 
@@ -87,7 +87,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'tracked.geo'
+    'geo',
 )
 # Extra stuff mytracks.net
 

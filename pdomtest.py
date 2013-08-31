@@ -24,7 +24,7 @@ import settings
 setup_environ(settings)
 
 
-from tracked.geo.models import Trip, Track, WayPoint, GpxFile
+from geo.models import Trip, Track, WayPoint, GpxFile
 
 gpx = GpxFile()
 gpx.name = 'My Year Trip'
