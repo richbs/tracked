@@ -242,7 +242,7 @@ class GpxFile(models.Model):
         """
         Wrap GPX file processing method
         """
-        self.process_gpx_file(str(self.filename), self)
+        self.process_gpx_file(str(self.filename))
 
 
     def save(self):

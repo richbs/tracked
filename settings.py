@@ -1,5 +1,3 @@
-# Django settings for tracked2 project.
-
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -12,12 +10,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'  # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
-DATABASE_NAME = BASE_PATH + '/tracked.db'  # Or path to database file if using sqlite3.
-DATABASE_USER = ''  # Not used with sqlite3.
-DATABASE_PASSWORD = ''  # Not used with sqlite3.
-DATABASE_HOST = ''
-DATABASE_PORT = '3306'  # Set to empty string for default. Not used with
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_PATH + '/tracked.db'
+    }
+}
 
 # Local time zone for this installation. Choices can be found here:
 # http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
@@ -96,8 +94,3 @@ FLICKR_USER = "38584744@N00"
 FLICKR_SECRET = ''
 
 GOOGLE_MAPS_KEY = 'AIzaSyDuyEu9FOMi86_Wl4W8GQHqOEZElrKtZ_E'
-BING_MAPS_KEY = 'AishbRBfRpF78Ucgabt4cfBMXsuvpm1O4dpKdqh4TiVM9wgKfeEmN20_J9DZniHA'
-# for localhost copy into settings_local
-# FLICKR_KEY = 'fdf907a1c4cc5fdc9a372758998be950'
-# FLICKR_SECRET = '02e6d9b5c45058b6'
-
