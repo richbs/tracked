@@ -2,3 +2,4 @@ Django==1.2.7
 flickrapi
 geopy
 coverage
+python-coveralls
