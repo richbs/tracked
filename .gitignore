@@ -1,1 +1,5 @@
 /tracked.db
+.*project
+venv
+*.pyc
+

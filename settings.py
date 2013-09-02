@@ -63,7 +63,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-    'tracked.middleware.GEMiddleware',
+    'geo.middleware.GEMiddleware',
 )
 
 ROOT_URLCONF = 'tracked.urls'
