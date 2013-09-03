@@ -10,6 +10,7 @@ class GpxTest(TestCase):
 
         filename = settings.BASE_PATH + '/geo/data/yorkshire.gpx'
         g = GpxFile()
+        g.name = "Tester"
         shutil.copyfile(filename, settings.MEDIA_ROOT + '/xml/yorkshire.gpx')
         g.filename = 'xml/yorkshire.gpx'
         g.save()
@@ -27,6 +28,7 @@ class ViewTest(TestCase):
 
         filename = settings.BASE_PATH + '/geo/data/yorkshire.gpx'
         g = GpxFile()
+        g.name = "Tester"
         shutil.copyfile(filename, settings.MEDIA_ROOT + '/xml/yorkshire.gpx')
         g.filename = 'xml/yorkshire.gpx'
         g.save()
@@ -39,4 +41,6 @@ class ViewTest(TestCase):
     def test_track(self):
         response = self.client.get('/track/1')
         self.assertContains(response, 'Distance', 1, 200)
-        
+
+        response = self.client.get('/os-track/1')
+        self.assertContains(response, 'Trip: Tester', 1, 200)

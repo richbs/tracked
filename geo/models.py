@@ -51,7 +51,6 @@ class GpxFile(models.Model):
         max_interval    = 3500
         min_length      = 1
         """
-        print 'creating tracks'
         # Our waypoints for this jaunt
         waypoints = self.waypoints.all().order_by('gmtime')
 
@@ -62,7 +61,6 @@ class GpxFile(models.Model):
         # Set the first times on the trap
         first_wp = waypoints[0]
         # Create first track and 0 out variables
-        print first_wp.localtime , "%s %d" % (self.name, track_count)
         tracks = Track.objects.filter(start_time=first_wp.localtime)
         if tracks:
             track = tracks[0]
@@ -283,7 +281,7 @@ class Track(models.Model):
     _offset_timedelta = timedelta(seconds=0)
     def first_trip(self):
         try:
-            return self.trip_set.all()[0]
+            return self.trip
         except IndexError:
             return False
     def waypoints_ordered(self):

@@ -6,8 +6,6 @@ from geo.models import GpxFile
 
 SELECT_YEARS = range(2006, datetime.date.today().year + 1)
 
-print SELECT_YEARS
-
 class DateSearch(forms.Form):
     from_date = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))
     to_date = forms.DateField(widget=SelectDateWidget(years=SELECT_YEARS))

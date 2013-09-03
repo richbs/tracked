@@ -193,8 +193,15 @@ def show_os_track(request, track_id):
     # geophotos = track.get_photos()
     # gpxfile = track.gpx_file
     # assert False, track.random_photos()
+    track_minutes = (track.end_time - track.start_time).seconds / 60.0
+    pace = track_minutes / float(track.length)
+    speed = float(track.length) / (track_minutes / 60.0)
 
-    return render_to_response('os_track.html', {'track':track}, context_instance=RequestContext(request))
+    intensity = speed * 0.0277
+    calories = intensity * track_minutes * 76
+    track_context = {'track':track, 'pace':pace, 'speed':speed, 'calories':calories, 'track_minutes':track_minutes}
+
+    return render_to_response('os_track.html', track_context, context_instance=RequestContext(request))
 
 def os_route(request):
     # geophotos = track.get_photos()
