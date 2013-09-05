@@ -1,7 +1,7 @@
 import shutil
 from django.conf import settings
 from django.test import TestCase
-from geo.models import GpxFile, WayPoint, Track
+from geo.models import GpxFile
 
 
 class GpxTest(TestCase):
@@ -37,6 +37,22 @@ class ViewTest(TestCase):
 
         response = self.client.get('/')
         self.assertContains(response, "Where have", 1, 200)
+
+    def test_home_dates(self):
+
+        values = {
+        'from_date_month': 3,
+        'from_date_day': 5,
+        'from_date_year': 2009,
+        'to_date_month': 12,
+        'to_date_day': 3,
+        'to_date_year': 2013
+        }
+
+        response = self.client.get('/', values)
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get('/', values, True)
+        self.assertContains(response, "Other tracks from these dates", 1, 200)
 
     def test_track(self):
         response = self.client.get('/track/1')
